@@ -1,0 +1,30 @@
+.order-detail {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 1rem 0 0.5rem;
+  }
+
+  &__id {
+    color: #6b7280;
+    font-size: 0.875rem;
+  }
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

@@ -1,0 +1,162 @@
+:host {
+  display: block;
+}
+
+.orders-page {
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0;
+  }
+}
+
+.orders-table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  font-size: 0.875rem;
+
+  thead {
+    background: #f5f7fa;
+  }
+
+  th {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  &__row {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: #f9fafb;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  td {
+    padding: 0.875rem 1rem;
+    color: #374151;
+    vertical-align: middle;
+  }
+
+  &__pair {
+    font-weight: 600;
+    color: #1a1a2e;
+  }
+
+  &__type {
+    color: #6b7280;
+  }
+
+  &__amount,
+  &__price {
+    font-family: 'Courier New', monospace;
+  }
+
+  &__empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 2.5rem 1rem;
+    font-style: italic;
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+
+  &--buy {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  &--sell {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  &--open {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &--executed {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  &--cancelled {
+    background: #f3f4f6;
+    color: #6b7280;
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+
+  &--primary {
+    padding: 0.625rem 1.25rem;
+    background: #2563eb;
+    color: #ffffff;
+
+    &:hover {
+      background: #1d4ed8;
+    }
+  }
+
+  &--outline {
+    padding: 0.375rem 0.875rem;
+    background: transparent;
+    color: #2563eb;
+    border: 1px solid #2563eb;
+
+    &:hover {
+      background: #eff6ff;
+    }
+  }
+
+  &--sm {
+    font-size: 0.8rem;
+  }
+}
