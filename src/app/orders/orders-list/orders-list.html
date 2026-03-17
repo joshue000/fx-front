@@ -4,7 +4,14 @@
     <button class="btn btn--primary" (click)="goToCreate()">+ New Order</button>
   </header>
 
-  <div class="orders-table-wrapper">
+  @if (error$ | async; as error) {
+    <div class="orders-error">{{ error }}</div>
+  }
+
+  @if (loading$ | async) {
+    <div class="orders-loading">Loading orders...</div>
+  } @else if (orders$ | async; as orders) {
+    <div class="orders-table-wrapper">
       <table class="orders-table">
         <thead>
           <tr>
@@ -48,4 +55,5 @@
         </tbody>
       </table>
     </div>
+  }
 </section>

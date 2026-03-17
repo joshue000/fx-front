@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, map, of, switchMap } from 'rxjs';
 
@@ -7,6 +7,9 @@ import { loadOrders, loadOrdersFailure, loadOrdersSuccess } from './orders.actio
 
 @Injectable()
 export class OrdersEffects {
+  private readonly actions$ = inject(Actions);
+  private readonly ordersService = inject(OrdersService);
+
   loadOrders$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadOrders),
@@ -18,9 +21,4 @@ export class OrdersEffects {
       )
     )
   );
-
-  constructor(
-    private readonly actions$: Actions,
-    private readonly ordersService: OrdersService
-  ) {}
 }
