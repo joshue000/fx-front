@@ -1,0 +1,12 @@
+<div class="page-size-selector">
+  <label class="page-size-selector__label" for="page-size">Rows per page</label>
+  <select
+    id="page-size"
+    class="page-size-selector__select"
+    (change)="onChange($event)"
+  >
+    @for (option of options; track option) {
+      <option [value]="option" [selected]="option === pageSize">{{ option }}</option>
+    }
+  </select>
+</div>

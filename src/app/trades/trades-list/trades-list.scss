@@ -90,6 +90,65 @@
   }
 }
 
+.trades-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+
+  &__pagination {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.trades-table__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &--view {
+    background: #eff6ff;
+    color: #2563eb;
+
+    &:hover {
+      background: #dbeafe;
+    }
+  }
+
+  &--edit {
+    background: #fefce8;
+    color: #ca8a04;
+
+    &:hover {
+      background: #fef9c3;
+    }
+  }
+
+  &--delete {
+    background: #fff1f2;
+    color: #e11d48;
+
+    &:hover {
+      background: #ffe4e6;
+    }
+  }
+}
+
 .badge {
   display: inline-block;
   padding: 0.25rem 0.625rem;

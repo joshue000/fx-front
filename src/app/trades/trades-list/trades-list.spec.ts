@@ -144,6 +144,25 @@ describe('TradesList', () => {
     expect(dispatchSpy).toHaveBeenCalledWith(loadTrades({ page: 3, limit: DEFAULT_PAGE_SIZE }));
   });
 
+  it('should dispatch loadTrades from page 1 with new limit when onPageSizeChange is called', () => {
+    const dispatchSpy = spyOn(store, 'dispatch');
+
+    component.onPageSizeChange(20);
+
+    expect(dispatchSpy).toHaveBeenCalledWith(loadTrades({ page: 1, limit: 20 }));
+    expect(component.currentPageSize).toBe(20);
+  });
+
+  it('should always use currentPageSize when changing page', () => {
+    const dispatchSpy = spyOn(store, 'dispatch');
+
+    component.onPageSizeChange(5);
+    dispatchSpy.calls.reset();
+    component.onPageChange(2);
+
+    expect(dispatchSpy).toHaveBeenCalledWith(loadTrades({ page: 2, limit: 5 }));
+  });
+
   it('should show the pagination component when totalPages > 1', async () => {
     mockSelectTrades.setResult([mockTrade]);
     mockSelectPagination.setResult(mockPagination);
@@ -173,6 +192,15 @@ describe('TradesList', () => {
     component.goToDetail('42');
 
     expect(router.navigate).toHaveBeenCalledWith(['/trades', '42']);
+  });
+
+  it('should navigate to trade edit when goToEdit is called', () => {
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
+
+    component.goToEdit('42');
+
+    expect(router.navigate).toHaveBeenCalledWith(['/trades', '42', 'edit']);
   });
 
   it('should navigate to new trade form when goToCreate is called', () => {

@@ -61,7 +61,8 @@
     padding: 0.5rem 0.75rem;
     border: 1px solid #d1d5db;
     border-radius: 6px;
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
+    font-family: inherit;
     outline: none;
     transition: border-color 0.15s;
     background: #fff;
@@ -98,7 +99,7 @@
 .btn {
   padding: 0.5rem 1.25rem;
   border-radius: 6px;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   border: none;

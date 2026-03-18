@@ -6,6 +6,43 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.10] - 2026-03-17
+
+### Added
+- Font Awesome 6.5.1 loaded via CDN in `index.html`
+- `TradesList` actions column now shows three icon buttons: view (eye), edit (pen), delete (trash) — each with `title` and `aria-label` attributes
+- `goToEdit(id)` method navigating to `/trades/:id/edit`
+- `onDelete(id)` stub method (logs warning, ready for delete action dispatch)
+- `.btn-icon` SCSS block with `--view` (blue), `--edit` (yellow), `--delete` (red) modifiers
+- Unit test for `goToEdit` navigation
+
+### Changed
+- Removed the `View Details` text button from the actions column
+
+---
+
+## [0.0.9] - 2026-03-17
+
+### Fixed
+- `PageSizeSelector`: replaced `[value]="pageSize"` on `<select>` with `[selected]="option === pageSize"` on each `<option>` — native `<select>` does not respond to `[value]` binding in Angular, causing the visual selection to always show the first option regardless of the actual value
+- `DEFAULT_PAGE_SIZE` changed from `10` to `5` so the initial fetch matches the visually selected option
+
+---
+
+## [0.0.8] - 2026-03-17
+
+### Added
+- Reusable `PageSizeSelector` component at `shared/page-size-selector/` — renders a `Rows per page` dropdown with options `[5, 10, 20]`, emits `pageSizeChange` output; exports `PAGE_SIZE_OPTIONS` constant
+- `TradesList` now renders a footer bar below the table with pagination centered and `PageSizeSelector` on the right
+- `onPageSizeChange(limit)` in `TradesList` — resets to page 1 and re-dispatches with new limit; updates `currentPageSize` so subsequent page navigation respects the selected limit
+- Unit tests for `PageSizeSelector` covering rendering, input binding, and change emission
+- Unit tests for `onPageSizeChange` and limit persistence in `TradesList`
+
+### Changed
+- `trade-form.scss` input/select/button font sizes aligned to `0.875rem` (matching `trades-list` buttons); added `font-family: inherit` to form controls
+
+---
+
 ## [0.0.7] - 2026-03-17
 
 ### Added

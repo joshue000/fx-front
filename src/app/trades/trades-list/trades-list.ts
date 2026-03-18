@@ -14,12 +14,13 @@ import {
   selectTradesPagination,
 } from '../store/trades.selectors';
 import { Pagination } from '../../shared/pagination/pagination';
+import { PageSizeSelector } from '../../shared/page-size-selector/page-size-selector';
 
-export const DEFAULT_PAGE_SIZE = 10;
+export const DEFAULT_PAGE_SIZE = 5;
 
 @Component({
   selector: 'app-trades-list',
-  imports: [AsyncPipe, UpperCasePipe, Pagination],
+  imports: [AsyncPipe, UpperCasePipe, Pagination, PageSizeSelector],
   templateUrl: './trades-list.html',
   styleUrl: './trades-list.scss'
 })
@@ -32,8 +33,10 @@ export class TradesList implements OnInit {
   readonly error$: Observable<string | null> = this.store.select(selectTradesError);
   readonly pagination$: Observable<PaginationMetadata | null> = this.store.select(selectTradesPagination);
 
+  currentPageSize = DEFAULT_PAGE_SIZE;
+
   ngOnInit(): void {
-    this.store.dispatch(loadTrades({ page: 1, limit: DEFAULT_PAGE_SIZE }));
+    this.store.dispatch(loadTrades({ page: 1, limit: this.currentPageSize }));
   }
 
   trackById(_index: number, trade: TradeOrder): string {
@@ -41,11 +44,25 @@ export class TradesList implements OnInit {
   }
 
   onPageChange(page: number): void {
-    this.store.dispatch(loadTrades({ page, limit: DEFAULT_PAGE_SIZE }));
+    this.store.dispatch(loadTrades({ page, limit: this.currentPageSize }));
+  }
+
+  onPageSizeChange(limit: number): void {
+    this.currentPageSize = limit;
+    this.store.dispatch(loadTrades({ page: 1, limit }));
   }
 
   goToDetail(id: string): void {
     this.router.navigate(['/trades', id]);
+  }
+
+  goToEdit(id: string): void {
+    this.router.navigate(['/trades', id, 'edit']);
+  }
+
+  onDelete(id: string): void {
+    // TODO: dispatch delete action
+    console.warn('Delete trade:', id);
   }
 
   goToCreate(): void {
