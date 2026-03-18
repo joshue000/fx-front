@@ -22,18 +22,20 @@
     <form class="trade-form" [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="trade-form__group">
         <label class="trade-form__label" for="pair">Currency Pair</label>
-        <input
+        <select
           id="pair"
-          class="trade-form__input"
+          class="trade-form__select"
           [class.trade-form__input--invalid]="isInvalid('pair')"
-          type="text"
           formControlName="pair"
-          placeholder="e.g. EUR/USD"
-          [attr.aria-label]="'Currency pair'"
-          [attr.readonly]="mode === 'view' ? true : null"
-        />
+          aria-label="Currency pair"
+        >
+          <option value="">Select pair</option>
+          @for (pair of validPairs; track pair) {
+            <option [value]="pair">{{ pair }}</option>
+          }
+        </select>
         @if (isInvalid('pair')) {
-          <span class="trade-form__hint">Currency pair is required.</span>
+          <span class="trade-form__hint">{{ getPairError() }}</span>
         }
       </div>
 
@@ -105,12 +107,12 @@
             type="number"
             formControlName="price"
             placeholder="0.00"
-            min="0"
+            min="0.0001"
             step="0.0001"
             aria-label="Trade price"
           />
           @if (isInvalid('price')) {
-            <span class="trade-form__hint">Price must be 0 or greater.</span>
+            <span class="trade-form__hint">{{ getPriceError() }}</span>
           }
         </div>
       </div>

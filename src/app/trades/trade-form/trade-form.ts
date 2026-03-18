@@ -11,6 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
 import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
 import { UpdateTradeDto } from '../../core/dtos/update-trade.dto';
+import { MARKET_PRICES, VALID_PAIRS } from '../../core/constants/market-prices.constant';
 import {
   createTrade,
   createTradeSuccess,
@@ -27,6 +28,8 @@ import {
   selectTradesUpdateError,
   selectTradesUpdating,
 } from '../store/trades.selectors';
+import { orderPriceGroupValidator, validPairValidator } from './validators/order-price.validator';
+import { PRICE_CROSS_FIELD_ERROR_KEYS } from './validators/order-price.validator';
 
 export type TradeFormMode = 'create' | 'view' | 'edit';
 
@@ -60,15 +63,19 @@ export class TradeForm implements OnInit {
   readonly orderSides = Object.values(OrderSide);
   readonly orderTypes = Object.values(OrderType);
   readonly orderStatuses = Object.values(OrderStatus);
+  readonly validPairs = VALID_PAIRS;
 
-  readonly form = this.fb.group({
-    pair: ['', [Validators.required]],
-    side: ['' as OrderSide | '', [Validators.required]],
-    type: ['' as OrderType | '', [Validators.required]],
-    amount: [null as number | null, [Validators.required, Validators.min(0.01)]],
-    price: [null as number | null, [Validators.required, Validators.min(0)]],
-    status: ['' as OrderStatus | ''],
-  });
+  readonly form = this.fb.group(
+    {
+      pair: ['', [Validators.required, validPairValidator]],
+      side: ['' as OrderSide | '', [Validators.required]],
+      type: ['' as OrderType | '', [Validators.required]],
+      amount: [null as number | null, [Validators.required, Validators.min(0.01)]],
+      price: [null as number | null, [Validators.required, Validators.min(0.0001)]],
+      status: ['' as OrderStatus | ''],
+    },
+    { validators: [orderPriceGroupValidator] },
+  );
 
   constructor() {
     this.actions$
@@ -78,6 +85,10 @@ export class TradeForm implements OnInit {
     this.actions$
       .pipe(ofType(updateTradeSuccess), takeUntilDestroyed())
       .subscribe(() => this.router.navigate(['/trades']));
+
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.syncMarketPrice());
   }
 
   ngOnInit(): void {
@@ -102,6 +113,8 @@ export class TradeForm implements OnInit {
 
           if (this.mode === 'view') {
             this.form.disable();
+          } else if (trade.type === OrderType.market) {
+            this.form.get('price')!.disable({ emitEvent: false });
           }
         });
     }
@@ -145,5 +158,65 @@ export class TradeForm implements OnInit {
   isInvalid(field: string): boolean {
     const control = this.form.get(field);
     return !!(control?.invalid && control?.touched);
+  }
+
+  getPairError(): string | null {
+    const control = this.form.get('pair')!;
+    if (!control.errors) return null;
+    if (control.errors['required']) return 'Currency pair is required.';
+    if (control.errors['invalidPair']) return `Pair must be one of: ${this.validPairs.join(', ')}.`;
+    return null;
+  }
+
+  getPriceError(): string | null {
+    const control = this.form.get('price')!;
+    if (!control.errors) return null;
+    if (control.errors['required']) return 'Price is required.';
+    if (control.errors['min']) return 'Price must be greater than 0.';
+    if (control.errors['limitBuyTooHigh']) {
+      return `Limit buy price must be below the market price (${control.errors['limitBuyTooHigh'].marketPrice}).`;
+    }
+    if (control.errors['limitSellTooLow']) {
+      return `Limit sell price must be above the market price (${control.errors['limitSellTooLow'].marketPrice}).`;
+    }
+    if (control.errors['stopBuyTooLow']) {
+      return `Stop buy price must be above the market price (${control.errors['stopBuyTooLow'].marketPrice}).`;
+    }
+    if (control.errors['stopSellTooHigh']) {
+      return `Stop sell price must be below the market price (${control.errors['stopSellTooHigh'].marketPrice}).`;
+    }
+    return null;
+  }
+
+  get isMarketOrder(): boolean {
+    return this.form.get('type')?.value === OrderType.market;
+  }
+
+  private syncMarketPrice(): void {
+    if (this.mode === 'view') return;
+
+    const priceControl = this.form.get('price')!;
+    const type = this.form.get('type')!.value;
+
+    if (type === OrderType.market) {
+      const pair = this.form.get('pair')!.value;
+      const marketPrice = pair ? (MARKET_PRICES[pair] ?? null) : null;
+
+      if (marketPrice !== null) {
+        priceControl.setValue(marketPrice, { emitEvent: false });
+      }
+
+      if (!priceControl.disabled) {
+        priceControl.disable({ emitEvent: false });
+        // Clear any cross-field errors since market orders have no price rule
+        const errors = { ...(priceControl.errors ?? {}) };
+        PRICE_CROSS_FIELD_ERROR_KEYS.forEach(key => delete errors[key]);
+        priceControl.setErrors(Object.keys(errors).length ? errors : null, { emitEvent: false });
+      }
+    } else {
+      if (priceControl.disabled) {
+        priceControl.enable({ emitEvent: false });
+      }
+    }
   }
 }

@@ -6,77 +6,35 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
-## [0.0.17] - 2026-03-17
-
-### Removed
-- `TradesSearcher` component and all related files (`trades/trades-searcher/trades-searcher.ts`, `.html`, `.scss`, `.spec.ts`)
-- `FilterTradesPipe` and its spec (`trades/pipes/filter-trades.pipe.ts`, `.spec.ts`)
-- `TradeSearchFilters` interface (`core/models/trade-search-filters.model.ts`)
-- `filters` field from `TradesState`
-- `selectTradesFilters` selector
-- `filters` prop from `loadTrades` action
-- Filter-related params from `TradesService.getTrades` and `TradesEffects.loadTrades$`
+## [0.0.14] - 2026-03-17
 
 ### Changed
-- `loadTrades` action reverted to `props<{ page: number; limit: number }>()` — no filter support
-- `TradesList` no longer imports `TradesSearcher` or `FilterTradesPipe`; template restored to plain `@for` over `trades$`
-- All spec `initialState` objects cleaned of `filters` field
-
----
-
-## [0.0.16] - 2026-03-18
-
-### Added
-- `FilterTradesPipe` at `trades/pipes/filter-trades.pipe.ts` — pure pipe, case-insensitive contains match on `trade.pair`
-- Unit tests for `FilterTradesPipe` covering empty term, whitespace, partial match, case-insensitivity, and trim
-
-### Changed
-- `TradesList` filter is now fully client-side via the pipe: `onSearch` sets `searchTerm`, no extra API call dispatched
-- Template applies `trades | filterTrades:searchTerm` on the `@for` loop
-- All server-side filter dispatch logic removed from `TradesList`
-
----
-
-## [0.0.15] - 2026-03-18
-
-### Fixed
-- Search now uses **server-side filtering**: `onSearch` dispatches `loadTrades` with `filters` to the API and resets to page 1, so results from all pages are returned — not just the current page's loaded data
-- Filters are persisted across `onPageChange` and `onPageSizeChange` so navigating pages keeps the active search
-- `dispatchLoad` helper detects empty filters and omits the `filters` key from the action entirely
-
----
-
-## [0.0.14] - 2026-03-18
-
-### Fixed
-- `Pagination`: removed unused `NgClass` import (NG8113 warning — `[class.xxx]` bindings don't require `NgClass`)
-- Filter now works via **client-side filtering**: `TradesList` uses `combineLatest([selectTrades, searchTerm$])` to filter the loaded trades in-memory; no API dependency required
-- `TradesList.onSearch` now updates a `BehaviorSubject<string>` (`searchTerm$`) instead of re-dispatching `loadTrades` with query params
-- Template uses `filteredTrades$` instead of `trades$`
-- `loadTrades` dispatches simplified — `filters` prop removed from all dispatch calls in `TradesList`
+- `pair` field changed from a free-text input to a `<select>` dropdown listing only the valid pairs (`BTCUSD`, `EURUSD`, `ETHUSD`); eliminates the need for manual ticker entry
 
 ---
 
 ## [0.0.13] - 2026-03-17
 
 ### Added
-- `TradeSearchFilters` interface at `core/models/trade-search-filters.model.ts` (`pair?`, `side?`, `type?`, `status?`)
-- `TradesSearcher` component at `trades/trades-searcher/`:
-  - `@Input() showFilters: boolean` — controls visibility of side/type/status dropdowns
-  - `@Output() search: EventEmitter<TradeSearchFilters>` — emits on button click or Enter key
-  - Pair text input always visible; filter dropdowns shown only when `showFilters = true`
-  - Clear button visible only when at least one filter is active
-  - Unit tests covering render, filter visibility, emit behavior, and clear
-- `selectTradesFilters` selector
-- `filters: TradeSearchFilters` field in `TradesState` (initial value `{}`)
+- `market-prices.constant.ts` at `core/constants/` — `MARKET_PRICES` record (`BTCUSD`, `EURUSD`, `ETHUSD`) and `VALID_PAIRS` array as the single source of truth for current market prices
+- `order-price.validator.ts` at `trades/trade-form/validators/`:
+  - `validateOrderPrice(pair, side, type, price)` — pure cross-field validation function
+  - `validPairValidator` — control-level ValidatorFn; rejects pairs not in `VALID_PAIRS`
+  - `orderPriceGroupValidator` — group-level ValidatorFn; sets errors directly on the price control once it is touched and dirty
+- `order-price.validator.spec.ts` — unit tests for all cases (limit, stop, market, boundary conditions, validPairValidator)
 
 ### Changed
-- `loadTrades` action now carries optional `filters?: TradeSearchFilters`
-- `TradesService.getTrades` appends filter params (`pair`, `side`, `type`, `status`) to query string when provided
-- `TradesEffects.loadTrades$` passes filters to service
-- `tradesReducer` stores filters from `loadTrades` action
-- `TradesList` wires `TradesSearcher` with `[showFilters]="true"`; `currentFilters` persists across page and page-size changes; dispatches without `filters` key when filters are empty
-- All spec `initialState` objects updated with `filters: {}`
+- `pair` field: no longer accepts slash format (e.g. `EUR/USD`); must use the ticker format (`EURUSD`). Placeholder updated accordingly. `validPairValidator` added to control validators.
+- `price` field: `Validators.min(0.0001)` replaces the previous `min(0)`. Cross-field validation via `orderPriceGroupValidator`:
+  - Limit buy: price must be **below** market price
+  - Limit sell: price must be **above** market price
+  - Stop buy: price must be **above** market price
+  - Stop sell: price must be **below** market price
+  - Market: no price rule; field is **auto-filled** with current market price and **disabled**
+- Price field re-enables automatically when type changes away from market
+- `getPairError()` and `getPriceError()` methods expose human-readable messages for template rendering
+- Template: pair hint shows the list of valid pairs; price hint is driven by `getPriceError()`; market order shows an info label instead of an error
+- `trade-form.spec.ts` updated: existing tests migrated to use valid pairs (`EURUSD` instead of `EUR/USD`); new test groups added for pair validation, cross-field price validation, and market order behavior
 
 ---
 
