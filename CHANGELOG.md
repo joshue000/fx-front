@@ -6,6 +6,18 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.18] - 2026-03-17
+
+### Added
+- `Dockerfile` — multi-stage build: Node 22 Alpine compiles the app, nginx 1.27 Alpine serves `dist/fx-front/browser`
+- `nginx.conf` — static asset caching headers; all routes fall back to `index.html` for Angular client-side routing
+- `.dockerignore` — excludes `node_modules`, `dist`, `.angular` cache, and shell scripts from the build context
+- `start.sh` — builds the Docker image and starts the container; respects `PORT` env var (default `4200`)
+- `stop.sh` — stops and removes the running container
+- `README.md` rewritten with prerequisites table, local dev, Docker start/stop instructions, and build notes
+
+---
+
 ## [0.0.17] - 2026-03-17
 
 ### Changed
