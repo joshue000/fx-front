@@ -6,6 +6,90 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.17] - 2026-03-17
+
+### Removed
+- `TradesSearcher` component and all related files (`trades/trades-searcher/trades-searcher.ts`, `.html`, `.scss`, `.spec.ts`)
+- `FilterTradesPipe` and its spec (`trades/pipes/filter-trades.pipe.ts`, `.spec.ts`)
+- `TradeSearchFilters` interface (`core/models/trade-search-filters.model.ts`)
+- `filters` field from `TradesState`
+- `selectTradesFilters` selector
+- `filters` prop from `loadTrades` action
+- Filter-related params from `TradesService.getTrades` and `TradesEffects.loadTrades$`
+
+### Changed
+- `loadTrades` action reverted to `props<{ page: number; limit: number }>()` — no filter support
+- `TradesList` no longer imports `TradesSearcher` or `FilterTradesPipe`; template restored to plain `@for` over `trades$`
+- All spec `initialState` objects cleaned of `filters` field
+
+---
+
+## [0.0.16] - 2026-03-18
+
+### Added
+- `FilterTradesPipe` at `trades/pipes/filter-trades.pipe.ts` — pure pipe, case-insensitive contains match on `trade.pair`
+- Unit tests for `FilterTradesPipe` covering empty term, whitespace, partial match, case-insensitivity, and trim
+
+### Changed
+- `TradesList` filter is now fully client-side via the pipe: `onSearch` sets `searchTerm`, no extra API call dispatched
+- Template applies `trades | filterTrades:searchTerm` on the `@for` loop
+- All server-side filter dispatch logic removed from `TradesList`
+
+---
+
+## [0.0.15] - 2026-03-18
+
+### Fixed
+- Search now uses **server-side filtering**: `onSearch` dispatches `loadTrades` with `filters` to the API and resets to page 1, so results from all pages are returned — not just the current page's loaded data
+- Filters are persisted across `onPageChange` and `onPageSizeChange` so navigating pages keeps the active search
+- `dispatchLoad` helper detects empty filters and omits the `filters` key from the action entirely
+
+---
+
+## [0.0.14] - 2026-03-18
+
+### Fixed
+- `Pagination`: removed unused `NgClass` import (NG8113 warning — `[class.xxx]` bindings don't require `NgClass`)
+- Filter now works via **client-side filtering**: `TradesList` uses `combineLatest([selectTrades, searchTerm$])` to filter the loaded trades in-memory; no API dependency required
+- `TradesList.onSearch` now updates a `BehaviorSubject<string>` (`searchTerm$`) instead of re-dispatching `loadTrades` with query params
+- Template uses `filteredTrades$` instead of `trades$`
+- `loadTrades` dispatches simplified — `filters` prop removed from all dispatch calls in `TradesList`
+
+---
+
+## [0.0.13] - 2026-03-17
+
+### Added
+- `TradeSearchFilters` interface at `core/models/trade-search-filters.model.ts` (`pair?`, `side?`, `type?`, `status?`)
+- `TradesSearcher` component at `trades/trades-searcher/`:
+  - `@Input() showFilters: boolean` — controls visibility of side/type/status dropdowns
+  - `@Output() search: EventEmitter<TradeSearchFilters>` — emits on button click or Enter key
+  - Pair text input always visible; filter dropdowns shown only when `showFilters = true`
+  - Clear button visible only when at least one filter is active
+  - Unit tests covering render, filter visibility, emit behavior, and clear
+- `selectTradesFilters` selector
+- `filters: TradeSearchFilters` field in `TradesState` (initial value `{}`)
+
+### Changed
+- `loadTrades` action now carries optional `filters?: TradeSearchFilters`
+- `TradesService.getTrades` appends filter params (`pair`, `side`, `type`, `status`) to query string when provided
+- `TradesEffects.loadTrades$` passes filters to service
+- `tradesReducer` stores filters from `loadTrades` action
+- `TradesList` wires `TradesSearcher` with `[showFilters]="true"`; `currentFilters` persists across page and page-size changes; dispatches without `filters` key when filters are empty
+- All spec `initialState` objects updated with `filters: {}`
+
+---
+
+## [0.0.12] - 2026-03-17
+
+### Removed
+- `Home` component and all related files (`home.ts`, `home.html`, `home.scss`, `home.spec.ts`)
+
+### Changed
+- Root route `''` now redirects to `trades` instead of loading the `Home` component
+
+---
+
 ## [0.0.11] - 2026-03-17
 
 ### Added

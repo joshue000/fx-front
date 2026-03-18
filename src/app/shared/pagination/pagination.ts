@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-pagination',
-  imports: [NgClass],
+  imports: [],
   templateUrl: './pagination.html',
   styleUrl: './pagination.scss',
 })

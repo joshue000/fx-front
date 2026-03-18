@@ -30,6 +30,13 @@ const buildState = (slice: Partial<TradesState>): { [TRADES_FEATURE_KEY]: Trades
     error: null,
     creating: false,
     createError: null,
+    selectedTrade: null,
+    loadingOne: false,
+    loadOneError: null,
+    updating: false,
+    updateError: null,
+    deleting: false,
+    deleteError: null,
     ...slice,
   },
 });
