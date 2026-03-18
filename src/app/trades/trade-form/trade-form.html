@@ -1,0 +1,126 @@
+<section class="trade-form-page">
+  <header class="trade-form-page__header">
+    <button class="btn btn--outline" (click)="goBack()">← Back to Orders</button>
+    <h1 class="trade-form-page__title">New Trade Order</h1>
+  </header>
+
+  @if (createError$ | async; as error) {
+    <div class="trade-form__error">{{ error }}</div>
+  }
+
+  <form class="trade-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="trade-form__group">
+      <label class="trade-form__label" for="pair">Currency Pair</label>
+      <input
+        id="pair"
+        class="trade-form__input"
+        [class.trade-form__input--invalid]="isInvalid('pair')"
+        type="text"
+        formControlName="pair"
+        placeholder="e.g. EUR/USD"
+      />
+      @if (isInvalid('pair')) {
+        <span class="trade-form__hint">Currency pair is required.</span>
+      }
+    </div>
+
+    <div class="trade-form__row">
+      <div class="trade-form__group">
+        <label class="trade-form__label" for="side">Side</label>
+        <select
+          id="side"
+          class="trade-form__select"
+          [class.trade-form__input--invalid]="isInvalid('side')"
+          formControlName="side"
+        >
+          <option value="">Select side</option>
+          @for (side of orderSides; track side) {
+            <option [value]="side">{{ side | uppercase }}</option>
+          }
+        </select>
+        @if (isInvalid('side')) {
+          <span class="trade-form__hint">Side is required.</span>
+        }
+      </div>
+
+      <div class="trade-form__group">
+        <label class="trade-form__label" for="type">Type</label>
+        <select
+          id="type"
+          class="trade-form__select"
+          [class.trade-form__input--invalid]="isInvalid('type')"
+          formControlName="type"
+        >
+          <option value="">Select type</option>
+          @for (type of orderTypes; track type) {
+            <option [value]="type">{{ type | uppercase }}</option>
+          }
+        </select>
+        @if (isInvalid('type')) {
+          <span class="trade-form__hint">Type is required.</span>
+        }
+      </div>
+    </div>
+
+    <div class="trade-form__row">
+      <div class="trade-form__group">
+        <label class="trade-form__label" for="amount">Amount</label>
+        <input
+          id="amount"
+          class="trade-form__input"
+          [class.trade-form__input--invalid]="isInvalid('amount')"
+          type="number"
+          formControlName="amount"
+          placeholder="0.00"
+          min="0.01"
+          step="0.01"
+        />
+        @if (isInvalid('amount')) {
+          <span class="trade-form__hint">Amount must be greater than 0.</span>
+        }
+      </div>
+
+      <div class="trade-form__group">
+        <label class="trade-form__label" for="price">Price</label>
+        <input
+          id="price"
+          class="trade-form__input"
+          [class.trade-form__input--invalid]="isInvalid('price')"
+          type="number"
+          formControlName="price"
+          placeholder="0.00"
+          min="0"
+          step="0.0001"
+        />
+        @if (isInvalid('price')) {
+          <span class="trade-form__hint">Price must be 0 or greater.</span>
+        }
+      </div>
+    </div>
+
+    <div class="trade-form__group">
+      <label class="trade-form__label" for="status">Status <span class="trade-form__optional">(optional)</span></label>
+      <select id="status" class="trade-form__select" formControlName="status">
+        <option value="">Select status</option>
+        @for (status of orderStatuses; track status) {
+          <option [value]="status">{{ status | uppercase }}</option>
+        }
+      </select>
+    </div>
+
+    <footer class="trade-form__footer">
+      <button type="button" class="btn btn--outline" (click)="goBack()">Cancel</button>
+      <button
+        type="submit"
+        class="btn btn--primary"
+        [disabled]="creating$ | async"
+      >
+        @if (creating$ | async) {
+          Submitting...
+        } @else {
+          Create Order
+        }
+      </button>
+    </footer>
+  </form>
+</section>

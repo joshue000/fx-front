@@ -20,3 +20,13 @@ export const selectOrdersError = createSelector(
   selectOrdersState,
   state => state.error
 );
+
+export const selectOrdersCreating = createSelector(
+  selectOrdersState,
+  state => state.creating
+);
+
+export const selectOrdersCreateError = createSelector(
+  selectOrdersState,
+  state => state.createError
+);

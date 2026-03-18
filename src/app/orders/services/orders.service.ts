@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import { TradeOrder } from '../../core/models/trade-order.model';
+import { CreateTradeOrderDto } from '../../core/dtos/create-trade-order.dto';
 
 @Injectable({ providedIn: 'root' })
 export class OrdersService {
@@ -13,5 +14,9 @@ export class OrdersService {
 
   getOrders(): Observable<TradeOrder[]> {
     return this.http.get<TradeOrder[]>(this.apiUrl);
+  }
+
+  createOrder(dto: CreateTradeOrderDto): Observable<TradeOrder> {
+    return this.http.post<TradeOrder>(this.apiUrl, dto);
   }
 }

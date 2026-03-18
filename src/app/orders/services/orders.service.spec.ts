@@ -4,6 +4,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 
 import { OrdersService } from './orders.service';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
+import { CreateTradeOrderDto } from '../../core/dtos/create-trade-order.dto';
 import { environment } from '../../../environments/environment';
 
 const mockOrders: TradeOrder[] = [
@@ -80,6 +81,55 @@ describe('OrdersService', () => {
       });
 
       httpController.expectOne(expectedUrl).flush([]);
+    });
+  });
+
+  describe('createOrder', () => {
+    const mockDto: CreateTradeOrderDto = {
+      pair: 'EUR/USD',
+      side: OrderSide.buy,
+      type: OrderType.limit,
+      amount: 10000,
+      price: 1.085,
+    };
+
+    const createdOrder: TradeOrder = {
+      id: '99',
+      pair: 'EUR/USD',
+      side: OrderSide.buy,
+      type: OrderType.limit,
+      amount: '10000',
+      price: '1.085',
+      status: OrderStatus.open,
+      createdAt: new Date('2026-03-17'),
+      updatedAt: new Date('2026-03-17'),
+    };
+
+    it('should perform a POST request to the trade_orders endpoint', () => {
+      service.createOrder(mockDto).subscribe();
+
+      const req = httpController.expectOne(expectedUrl);
+      expect(req.request.method).toBe('POST');
+
+      req.flush(createdOrder);
+    });
+
+    it('should send the DTO as the request body', () => {
+      service.createOrder(mockDto).subscribe();
+
+      const req = httpController.expectOne(expectedUrl);
+      expect(req.request.body).toEqual(mockDto);
+
+      req.flush(createdOrder);
+    });
+
+    it('should return the created trade order from the API', (done) => {
+      service.createOrder(mockDto).subscribe((order) => {
+        expect(order).toEqual(createdOrder);
+        done();
+      });
+
+      httpController.expectOne(expectedUrl).flush(createdOrder);
     });
   });
 });

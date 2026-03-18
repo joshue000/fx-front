@@ -5,8 +5,16 @@ import { ReplaySubject, of, throwError } from 'rxjs';
 
 import { OrdersEffects } from './orders.effects';
 import { OrdersService } from '../services/orders.service';
-import { loadOrders, loadOrdersFailure, loadOrdersSuccess } from './orders.actions';
+import {
+  createOrder,
+  createOrderFailure,
+  createOrderSuccess,
+  loadOrders,
+  loadOrdersFailure,
+  loadOrdersSuccess,
+} from './orders.actions';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
+import { CreateTradeOrderDto } from '../../core/dtos/create-trade-order.dto';
 
 const mockOrder: TradeOrder = {
   id: '1',
@@ -27,7 +35,7 @@ describe('OrdersEffects', () => {
 
   beforeEach(() => {
     actions$ = new ReplaySubject<Action>(1);
-    ordersServiceSpy = jasmine.createSpyObj<OrdersService>('OrdersService', ['getOrders']);
+    ordersServiceSpy = jasmine.createSpyObj<OrdersService>('OrdersService', ['getOrders', 'createOrder']);
 
     TestBed.configureTestingModule({
       providers: [
@@ -75,6 +83,52 @@ describe('OrdersEffects', () => {
       });
 
       actions$.next(loadOrders());
+    });
+  });
+
+  describe('createOrder$', () => {
+    const mockDto: CreateTradeOrderDto = {
+      pair: 'EUR/USD',
+      side: OrderSide.buy,
+      type: OrderType.limit,
+      amount: 10000,
+      price: 1.085,
+    };
+
+    it('should dispatch createOrderSuccess when the service returns the created order', (done) => {
+      ordersServiceSpy.createOrder.and.returnValue(of(mockOrder));
+
+      effects.createOrder$.subscribe((action) => {
+        expect(action).toEqual(createOrderSuccess({ order: mockOrder }));
+        done();
+      });
+
+      actions$.next(createOrder({ dto: mockDto }));
+    });
+
+    it('should dispatch createOrderFailure when the service throws an error', (done) => {
+      const errorMessage = 'Validation failed';
+      ordersServiceSpy.createOrder.and.returnValue(
+        throwError(() => new Error(errorMessage))
+      );
+
+      effects.createOrder$.subscribe((action) => {
+        expect(action).toEqual(createOrderFailure({ error: errorMessage }));
+        done();
+      });
+
+      actions$.next(createOrder({ dto: mockDto }));
+    });
+
+    it('should call OrdersService.createOrder with the provided DTO', (done) => {
+      ordersServiceSpy.createOrder.and.returnValue(of(mockOrder));
+
+      effects.createOrder$.subscribe(() => {
+        expect(ordersServiceSpy.createOrder).toHaveBeenCalledWith(mockDto);
+        done();
+      });
+
+      actions$.next(createOrder({ dto: mockDto }));
     });
   });
 });

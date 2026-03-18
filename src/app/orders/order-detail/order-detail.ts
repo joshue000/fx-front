@@ -19,6 +19,6 @@ export class OrderDetail {
   }
 
   goBack(): void {
-    this.router.navigate(['/orders']);
+    this.router.navigate(['/trades']);
   }
 }

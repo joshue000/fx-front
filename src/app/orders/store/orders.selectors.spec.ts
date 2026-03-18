@@ -19,6 +19,8 @@ const buildState = (slice: Partial<OrdersState>): { [ORDERS_FEATURE_KEY]: Orders
     orders: [],
     loading: false,
     error: null,
+    creating: false,
+    createError: null,
     ...slice,
   },
 });

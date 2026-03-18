@@ -6,6 +6,22 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.5] - 2026-03-17
+
+### Added
+- `CreateTradeOrderDto` interface at `core/dtos/create-trade-order.dto.ts` (`side`, `type`, `amount`, `price`, `pair`, optional `status`)
+- `TradeForm` reactive form component at `trades/trade-form/` routed as `trades/new`
+  - Validates all required fields with inline error hints
+  - Dispatches `createOrder` action on valid submit
+  - Navigates to `/orders` automatically on `createOrderSuccess` using `takeUntilDestroyed`
+  - Submit button disabled while creating
+- `OrdersService.createOrder(dto)` — POST to `trade_orders` endpoint
+- NgRx store extended with create flow: `createOrder`, `createOrderSuccess`, `createOrderFailure` actions; `creating` and `createError` state fields; `selectOrdersCreating` and `selectOrdersCreateError` selectors; `createOrder$` effect
+- Unit tests for `TradeForm` covering form validation, dispatch, navigation, and template states
+- Unit tests for new reducer create transitions, new effect paths, and new service POST method
+
+---
+
 ## [0.0.4] - 2026-03-17
 
 ### Added
@@ -50,6 +66,6 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 - `Home` component with navigation link to orders
 - `OrdersList` component with table layout, badge styling, and routing
 - `OrderDetail` component reading order id from route params
-- Lazy-loaded routes: `/`, `/orders`, `/orders/:id`
+- Lazy-loaded routes: `/`, `/trades`, `/trades/:id`
 - `TradeOrder` model with `OrderSide`, `OrderType`, and `OrderStatus` enums
 - Environment files for development and production with `apiUrl` constant

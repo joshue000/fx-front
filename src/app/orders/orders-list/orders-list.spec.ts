@@ -27,6 +27,8 @@ const initialState: { [ORDERS_FEATURE_KEY]: OrdersState } = {
     orders: [],
     loading: false,
     error: null,
+    creating: false,
+    createError: null,
   },
 };
 
@@ -129,7 +131,7 @@ describe('OrdersList', () => {
 
     component.goToDetail('42');
 
-    expect(router.navigate).toHaveBeenCalledWith(['/orders', '42']);
+    expect(router.navigate).toHaveBeenCalledWith(['/trades', '42']);
   });
 
   it('should navigate to new order form when goToCreate is called', () => {
@@ -138,6 +140,6 @@ describe('OrdersList', () => {
 
     component.goToCreate();
 
-    expect(router.navigate).toHaveBeenCalledWith(['/orders', 'new']);
+    expect(router.navigate).toHaveBeenCalledWith(['/trades', 'new']);
   });
 });

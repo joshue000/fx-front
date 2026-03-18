@@ -31,10 +31,10 @@ export class OrdersList implements OnInit {
   }
 
   goToDetail(id: string): void {
-    this.router.navigate(['/orders', id]);
+    this.router.navigate(['/trades', id]);
   }
 
   goToCreate(): void {
-    this.router.navigate(['/orders', 'new']);
+    this.router.navigate(['/trades', 'new']);
   }
 }

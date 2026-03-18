@@ -49,7 +49,7 @@ describe('OrderDetail', () => {
 
       component.goBack();
 
-      expect(router.navigate).toHaveBeenCalledWith(['/orders']);
+      expect(router.navigate).toHaveBeenCalledWith(['/trades']);
     });
   });
 
