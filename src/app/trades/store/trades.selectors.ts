@@ -35,3 +35,38 @@ export const selectTradesCreateError = createSelector(
   selectTradesState,
   state => state.createError
 );
+
+export const selectSelectedTrade = createSelector(
+  selectTradesState,
+  state => state.selectedTrade
+);
+
+export const selectTradesLoadingOne = createSelector(
+  selectTradesState,
+  state => state.loadingOne
+);
+
+export const selectTradesLoadOneError = createSelector(
+  selectTradesState,
+  state => state.loadOneError
+);
+
+export const selectTradesUpdating = createSelector(
+  selectTradesState,
+  state => state.updating
+);
+
+export const selectTradesUpdateError = createSelector(
+  selectTradesState,
+  state => state.updateError
+);
+
+export const selectTradesDeleting = createSelector(
+  selectTradesState,
+  state => state.deleting
+);
+
+export const selectTradesDeleteError = createSelector(
+  selectTradesState,
+  state => state.deleteError
+);

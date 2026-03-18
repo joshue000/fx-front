@@ -6,6 +6,29 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.11] - 2026-03-17
+
+### Added
+- `UpdateTradeDto` interface at `core/dtos/update-trade.dto.ts`
+- `TradesService.getTradeById(id)`, `updateTrade(id, dto)`, `deleteTrade(id)` methods
+- NgRx actions: `loadTrade/Success/Failure`, `updateTrade/Success/Failure`, `deleteTrade/Success/Failure`
+- NgRx state fields: `selectedTrade`, `loadingOne`, `loadOneError`, `updating`, `updateError`, `deleting`, `deleteError`
+- NgRx selectors for all new state fields
+- NgRx effects: `loadTrade$`, `updateTrade$`, `deleteTrade$`
+- `ConfirmModal` shared component at `shared/confirm-modal/` — accepts `message` input, emits `confirmed`/`cancelled`; includes unit tests
+- `TradeFormMode` type (`'create' | 'view' | 'edit'`) — `TradeForm` now reads mode from route data
+- View mode (`trades/:id`): fetches trade via GET, all fields disabled, no submit button
+- Edit mode (`trades/:id/edit`): fetches trade via GET, fields editable, submit dispatches PUT via `updateTrade`
+- Delete flow in `TradesList`: `onDelete` opens `ConfirmModal`; confirm dispatches `deleteTrade`; success closes modal and reloads list
+- Route `trades/:id/edit` added; `trades/:id` and `trades/new` updated with `data: { mode }`
+
+### Changed
+- `TradeForm` title, submit label, and footer adapt to mode (`create`/`edit`/`view`)
+- `trades/:id` now loads `TradeForm` in view mode (previously routed to `TradeDetail`)
+- All spec `initialState` objects updated with new `TradesState` fields
+
+---
+
 ## [0.0.10] - 2026-03-17
 
 ### Added

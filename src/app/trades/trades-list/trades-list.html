@@ -96,3 +96,11 @@
     </footer>
   }
 </section>
+
+@if (showDeleteModal) {
+  <app-confirm-modal
+    message="Are you sure you want to delete this trade? This action cannot be undone."
+    (confirmed)="onDeleteConfirmed()"
+    (cancelled)="onDeleteCancelled()"
+  />
+}

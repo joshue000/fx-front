@@ -7,9 +7,18 @@ import {
   createTrade,
   createTradeFailure,
   createTradeSuccess,
+  deleteTrade,
+  deleteTradeFailure,
+  deleteTradeSuccess,
+  loadTrade,
+  loadTradeFailure,
+  loadTradeSuccess,
   loadTrades,
   loadTradesFailure,
   loadTradesSuccess,
+  updateTrade,
+  updateTradeFailure,
+  updateTradeSuccess,
 } from './trades.actions';
 
 @Injectable()
@@ -29,6 +38,18 @@ export class TradesEffects {
     )
   );
 
+  loadTrade$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(loadTrade),
+      switchMap(({ id }) =>
+        this.tradesService.getTradeById(id).pipe(
+          map(trade => loadTradeSuccess({ trade })),
+          catchError(error => of(loadTradeFailure({ error: error.message })))
+        )
+      )
+    )
+  );
+
   createTrade$ = createEffect(() =>
     this.actions$.pipe(
       ofType(createTrade),
@@ -36,6 +57,30 @@ export class TradesEffects {
         this.tradesService.createTrade(dto).pipe(
           map(trade => createTradeSuccess({ trade })),
           catchError(error => of(createTradeFailure({ error: error.message })))
+        )
+      )
+    )
+  );
+
+  updateTrade$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(updateTrade),
+      switchMap(({ id, dto }) =>
+        this.tradesService.updateTrade(id, dto).pipe(
+          map(trade => updateTradeSuccess({ trade })),
+          catchError(error => of(updateTradeFailure({ error: error.message })))
+        )
+      )
+    )
+  );
+
+  deleteTrade$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(deleteTrade),
+      switchMap(({ id }) =>
+        this.tradesService.deleteTrade(id).pipe(
+          map(() => deleteTradeSuccess({ id })),
+          catchError(error => of(deleteTradeFailure({ error: error.message })))
         )
       )
     )

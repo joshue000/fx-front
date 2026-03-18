@@ -1,126 +1,158 @@
 <section class="trade-form-page">
   <header class="trade-form-page__header">
-    <button class="btn btn--outline" (click)="goBack()">← Back to Orders</button>
-    <h1 class="trade-form-page__title">New Trade Order</h1>
+    <button class="btn btn--outline" (click)="goBack()">← Back to Trades</button>
+    <h1 class="trade-form-page__title">
+      @if (mode === 'create') { New Trade Order }
+      @else if (mode === 'edit') { Edit Trade Order }
+      @else { Trade Details }
+    </h1>
   </header>
 
-  @if (createError$ | async; as error) {
-    <div class="trade-form__error">{{ error }}</div>
+  @if (mode !== 'create' && (loadingOne$ | async)) {
+    <div class="trade-form__loading">Loading trade...</div>
+  } @else {
+    @if (submitError$ | async; as error) {
+      <div class="trade-form__error">{{ error }}</div>
+    }
+
+    @if (mode !== 'create' && (loadOneError$ | async); as loadError) {
+      <div class="trade-form__error">{{ loadError }}</div>
+    }
+
+    <form class="trade-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="trade-form__group">
+        <label class="trade-form__label" for="pair">Currency Pair</label>
+        <input
+          id="pair"
+          class="trade-form__input"
+          [class.trade-form__input--invalid]="isInvalid('pair')"
+          type="text"
+          formControlName="pair"
+          placeholder="e.g. EUR/USD"
+          [attr.aria-label]="'Currency pair'"
+          [attr.readonly]="mode === 'view' ? true : null"
+        />
+        @if (isInvalid('pair')) {
+          <span class="trade-form__hint">Currency pair is required.</span>
+        }
+      </div>
+
+      <div class="trade-form__row">
+        <div class="trade-form__group">
+          <label class="trade-form__label" for="side">Side</label>
+          <select
+            id="side"
+            class="trade-form__select"
+            [class.trade-form__input--invalid]="isInvalid('side')"
+            formControlName="side"
+            aria-label="Order side"
+          >
+            <option value="">Select side</option>
+            @for (side of orderSides; track side) {
+              <option [value]="side">{{ side | uppercase }}</option>
+            }
+          </select>
+          @if (isInvalid('side')) {
+            <span class="trade-form__hint">Side is required.</span>
+          }
+        </div>
+
+        <div class="trade-form__group">
+          <label class="trade-form__label" for="type">Type</label>
+          <select
+            id="type"
+            class="trade-form__select"
+            [class.trade-form__input--invalid]="isInvalid('type')"
+            formControlName="type"
+            aria-label="Order type"
+          >
+            <option value="">Select type</option>
+            @for (type of orderTypes; track type) {
+              <option [value]="type">{{ type | uppercase }}</option>
+            }
+          </select>
+          @if (isInvalid('type')) {
+            <span class="trade-form__hint">Type is required.</span>
+          }
+        </div>
+      </div>
+
+      <div class="trade-form__row">
+        <div class="trade-form__group">
+          <label class="trade-form__label" for="amount">Amount</label>
+          <input
+            id="amount"
+            class="trade-form__input"
+            [class.trade-form__input--invalid]="isInvalid('amount')"
+            type="number"
+            formControlName="amount"
+            placeholder="0.00"
+            min="0.01"
+            step="0.01"
+            aria-label="Trade amount"
+          />
+          @if (isInvalid('amount')) {
+            <span class="trade-form__hint">Amount must be greater than 0.</span>
+          }
+        </div>
+
+        <div class="trade-form__group">
+          <label class="trade-form__label" for="price">Price</label>
+          <input
+            id="price"
+            class="trade-form__input"
+            [class.trade-form__input--invalid]="isInvalid('price')"
+            type="number"
+            formControlName="price"
+            placeholder="0.00"
+            min="0"
+            step="0.0001"
+            aria-label="Trade price"
+          />
+          @if (isInvalid('price')) {
+            <span class="trade-form__hint">Price must be 0 or greater.</span>
+          }
+        </div>
+      </div>
+
+      <div class="trade-form__group">
+        <label class="trade-form__label" for="status">
+          Status <span class="trade-form__optional">(optional)</span>
+        </label>
+        <select
+          id="status"
+          class="trade-form__select"
+          formControlName="status"
+          aria-label="Order status"
+        >
+          <option value="">Select status</option>
+          @for (status of orderStatuses; track status) {
+            <option [value]="status">{{ status | uppercase }}</option>
+          }
+        </select>
+      </div>
+
+      <footer class="trade-form__footer">
+        <button type="button" class="btn btn--outline" (click)="goBack()">
+          @if (mode === 'view') { Close } @else { Cancel }
+        </button>
+        @if (mode !== 'view') {
+          <button
+            type="submit"
+            class="btn btn--primary"
+            [disabled]="submitting$ | async"
+            aria-label="Submit trade form"
+          >
+            @if (submitting$ | async) {
+              Submitting...
+            } @else if (mode === 'edit') {
+              Save Changes
+            } @else {
+              Create Order
+            }
+          </button>
+        }
+      </footer>
+    </form>
   }
-
-  <form class="trade-form" [formGroup]="form" (ngSubmit)="onSubmit()">
-    <div class="trade-form__group">
-      <label class="trade-form__label" for="pair">Currency Pair</label>
-      <input
-        id="pair"
-        class="trade-form__input"
-        [class.trade-form__input--invalid]="isInvalid('pair')"
-        type="text"
-        formControlName="pair"
-        placeholder="e.g. EUR/USD"
-      />
-      @if (isInvalid('pair')) {
-        <span class="trade-form__hint">Currency pair is required.</span>
-      }
-    </div>
-
-    <div class="trade-form__row">
-      <div class="trade-form__group">
-        <label class="trade-form__label" for="side">Side</label>
-        <select
-          id="side"
-          class="trade-form__select"
-          [class.trade-form__input--invalid]="isInvalid('side')"
-          formControlName="side"
-        >
-          <option value="">Select side</option>
-          @for (side of orderSides; track side) {
-            <option [value]="side">{{ side | uppercase }}</option>
-          }
-        </select>
-        @if (isInvalid('side')) {
-          <span class="trade-form__hint">Side is required.</span>
-        }
-      </div>
-
-      <div class="trade-form__group">
-        <label class="trade-form__label" for="type">Type</label>
-        <select
-          id="type"
-          class="trade-form__select"
-          [class.trade-form__input--invalid]="isInvalid('type')"
-          formControlName="type"
-        >
-          <option value="">Select type</option>
-          @for (type of orderTypes; track type) {
-            <option [value]="type">{{ type | uppercase }}</option>
-          }
-        </select>
-        @if (isInvalid('type')) {
-          <span class="trade-form__hint">Type is required.</span>
-        }
-      </div>
-    </div>
-
-    <div class="trade-form__row">
-      <div class="trade-form__group">
-        <label class="trade-form__label" for="amount">Amount</label>
-        <input
-          id="amount"
-          class="trade-form__input"
-          [class.trade-form__input--invalid]="isInvalid('amount')"
-          type="number"
-          formControlName="amount"
-          placeholder="0.00"
-          min="0.01"
-          step="0.01"
-        />
-        @if (isInvalid('amount')) {
-          <span class="trade-form__hint">Amount must be greater than 0.</span>
-        }
-      </div>
-
-      <div class="trade-form__group">
-        <label class="trade-form__label" for="price">Price</label>
-        <input
-          id="price"
-          class="trade-form__input"
-          [class.trade-form__input--invalid]="isInvalid('price')"
-          type="number"
-          formControlName="price"
-          placeholder="0.00"
-          min="0"
-          step="0.0001"
-        />
-        @if (isInvalid('price')) {
-          <span class="trade-form__hint">Price must be 0 or greater.</span>
-        }
-      </div>
-    </div>
-
-    <div class="trade-form__group">
-      <label class="trade-form__label" for="status">Status <span class="trade-form__optional">(optional)</span></label>
-      <select id="status" class="trade-form__select" formControlName="status">
-        <option value="">Select status</option>
-        @for (status of orderStatuses; track status) {
-          <option [value]="status">{{ status | uppercase }}</option>
-        }
-      </select>
-    </div>
-
-    <footer class="trade-form__footer">
-      <button type="button" class="btn btn--outline" (click)="goBack()">Cancel</button>
-      <button
-        type="submit"
-        class="btn btn--primary"
-        [disabled]="creating$ | async"
-      >
-        @if (creating$ | async) {
-          Submitting...
-        } @else {
-          Create Order
-        }
-      </button>
-    </footer>
-  </form>
 </section>

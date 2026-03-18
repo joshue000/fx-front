@@ -11,10 +11,17 @@ export const routes: Routes = [
   },
   {
     path: 'trades/new',
-    loadComponent: () => import('./trades/trade-form/trade-form').then(m => m.TradeForm)
+    loadComponent: () => import('./trades/trade-form/trade-form').then(m => m.TradeForm),
+    data: { mode: 'create' }
+  },
+  {
+    path: 'trades/:id/edit',
+    loadComponent: () => import('./trades/trade-form/trade-form').then(m => m.TradeForm),
+    data: { mode: 'edit' }
   },
   {
     path: 'trades/:id',
-    loadComponent: () => import('./trades/trade-detail/trade-detail').then(m => m.TradeDetail)
+    loadComponent: () => import('./trades/trade-form/trade-form').then(m => m.TradeForm),
+    data: { mode: 'view' }
   }
 ];

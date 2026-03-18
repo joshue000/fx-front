@@ -8,6 +8,13 @@ export interface TradesState {
   error: string | null;
   creating: boolean;
   createError: string | null;
+  selectedTrade: TradeOrder | null;
+  loadingOne: boolean;
+  loadOneError: string | null;
+  updating: boolean;
+  updateError: string | null;
+  deleting: boolean;
+  deleteError: string | null;
 }
 
 export const initialTradesState: TradesState = {
@@ -17,4 +24,11 @@ export const initialTradesState: TradesState = {
   error: null,
   creating: false,
   createError: null,
+  selectedTrade: null,
+  loadingOne: false,
+  loadOneError: null,
+  updating: false,
+  updateError: null,
+  deleting: false,
+  deleteError: null,
 };

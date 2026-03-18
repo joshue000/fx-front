@@ -6,8 +6,13 @@ import { provideMockActions } from '@ngrx/effects/testing';
 import { ReplaySubject } from 'rxjs';
 
 import { TradeForm } from './trade-form';
-import { createTrade, createTradeSuccess } from '../store/trades.actions';
-import { selectTradesCreateError, selectTradesCreating } from '../store/trades.selectors';
+import { createTrade, createTradeSuccess, updateTradeSuccess } from '../store/trades.actions';
+import {
+  selectTradesCreateError,
+  selectTradesCreating,
+  selectTradesUpdateError,
+  selectTradesUpdating,
+} from '../store/trades.selectors';
 import { TradesState } from '../store/trades.state';
 import { TRADES_FEATURE_KEY } from '../store/trades.selectors';
 import { OrderSide, OrderStatus, OrderType } from '../../core/models/trade-order.model';
@@ -20,6 +25,13 @@ const initialState: { [TRADES_FEATURE_KEY]: TradesState } = {
     error: null,
     creating: false,
     createError: null,
+    selectedTrade: null,
+    loadingOne: false,
+    loadOneError: null,
+    updating: false,
+    updateError: null,
+    deleting: false,
+    deleteError: null,
   },
 };
 
@@ -46,6 +58,8 @@ describe('TradeForm', () => {
     store = TestBed.inject(MockStore);
     mockSelectCreating = store.overrideSelector(selectTradesCreating, false);
     mockSelectCreateError = store.overrideSelector(selectTradesCreateError, null);
+    store.overrideSelector(selectTradesUpdating, false);
+    store.overrideSelector(selectTradesUpdateError, null);
 
     fixture = TestBed.createComponent(TradeForm);
     component = fixture.componentInstance;
@@ -58,6 +72,10 @@ describe('TradeForm', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should default to create mode when no route data is present', () => {
+    expect(component.mode).toBe('create');
   });
 
   it('should initialize the form with empty values', () => {
@@ -118,7 +136,7 @@ describe('TradeForm', () => {
     });
   });
 
-  describe('onSubmit', () => {
+  describe('onSubmit (create mode)', () => {
     it('should not dispatch when the form is invalid', () => {
       const dispatchSpy = spyOn(store, 'dispatch');
 
@@ -191,10 +209,19 @@ describe('TradeForm', () => {
 
       expect(router.navigate).toHaveBeenCalledWith(['/trades']);
     });
+
+    it('should navigate to /trades after updateTradeSuccess action', () => {
+      const router = TestBed.inject(Router);
+      spyOn(router, 'navigate');
+
+      actions$.next(updateTradeSuccess({ trade: {} as any }));
+
+      expect(router.navigate).toHaveBeenCalledWith(['/trades']);
+    });
   });
 
   describe('template', () => {
-    it('should display the error message when createError$ emits', async () => {
+    it('should display the error message when submitError$ emits', async () => {
       mockSelectCreateError.setResult('Server error');
       store.refreshState();
       fixture.detectChanges();
@@ -205,7 +232,7 @@ describe('TradeForm', () => {
       expect(errorEl.textContent.trim()).toBe('Server error');
     });
 
-    it('should disable the submit button when creating$ is true', async () => {
+    it('should disable the submit button when submitting$ is true', async () => {
       mockSelectCreating.setResult(true);
       store.refreshState();
       fixture.detectChanges();
@@ -213,6 +240,11 @@ describe('TradeForm', () => {
 
       const submitBtn = fixture.nativeElement.querySelector('button[type="submit"]');
       expect(submitBtn.disabled).toBeTrue();
+    });
+
+    it('should show the submit button in create mode', () => {
+      const submitBtn = fixture.nativeElement.querySelector('button[type="submit"]');
+      expect(submitBtn).not.toBeNull();
     });
   });
 });

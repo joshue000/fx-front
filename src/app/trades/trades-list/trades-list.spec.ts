@@ -1,10 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
-import { MemoizedSelector } from '@ngrx/store';
+import { Action, MemoizedSelector } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
+import { provideMockActions } from '@ngrx/effects/testing';
+import { ReplaySubject } from 'rxjs';
 
 import { TradesList, DEFAULT_PAGE_SIZE } from './trades-list';
-import { loadTrades } from '../store/trades.actions';
+import { deleteTrade, deleteTradeSuccess, loadTrades } from '../store/trades.actions';
 import { selectTrades, selectTradesError, selectTradesLoading, selectTradesPagination } from '../store/trades.selectors';
 import { TradesState } from '../store/trades.state';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
@@ -38,6 +40,13 @@ const initialState: { [TRADES_FEATURE_KEY]: TradesState } = {
     error: null,
     creating: false,
     createError: null,
+    selectedTrade: null,
+    loadingOne: false,
+    loadOneError: null,
+    updating: false,
+    updateError: null,
+    deleting: false,
+    deleteError: null,
   },
 };
 
@@ -45,17 +54,21 @@ describe('TradesList', () => {
   let component: TradesList;
   let fixture: ComponentFixture<TradesList>;
   let store: MockStore;
+  let actions$: ReplaySubject<Action>;
   let mockSelectTrades: MemoizedSelector<object, TradeOrder[]>;
   let mockSelectLoading: MemoizedSelector<object, boolean>;
   let mockSelectError: MemoizedSelector<object, string | null>;
   let mockSelectPagination: MemoizedSelector<object, PaginationMetadata | null>;
 
   beforeEach(async () => {
+    actions$ = new ReplaySubject<Action>(1);
+
     await TestBed.configureTestingModule({
       imports: [TradesList],
       providers: [
         provideRouter([]),
         provideMockStore({ initialState }),
+        provideMockActions(() => actions$),
       ],
     }).compileComponents();
 
@@ -210,5 +223,43 @@ describe('TradesList', () => {
     component.goToCreate();
 
     expect(router.navigate).toHaveBeenCalledWith(['/trades', 'new']);
+  });
+
+  describe('delete flow', () => {
+    it('should open the delete modal and set deleteTargetId when onDelete is called', () => {
+      component.onDelete('99');
+
+      expect(component.showDeleteModal).toBeTrue();
+      expect(component.deleteTargetId).toBe('99');
+    });
+
+    it('should close the delete modal and clear deleteTargetId when onDeleteCancelled is called', () => {
+      component.onDelete('99');
+      component.onDeleteCancelled();
+
+      expect(component.showDeleteModal).toBeFalse();
+      expect(component.deleteTargetId).toBeNull();
+    });
+
+    it('should dispatch deleteTrade when onDeleteConfirmed is called with a target id', () => {
+      const dispatchSpy = spyOn(store, 'dispatch');
+      component.deleteTargetId = '99';
+
+      component.onDeleteConfirmed();
+
+      expect(dispatchSpy).toHaveBeenCalledWith(deleteTrade({ id: '99' }));
+    });
+
+    it('should close the modal and reload trades when deleteTradeSuccess is dispatched', () => {
+      const dispatchSpy = spyOn(store, 'dispatch');
+      component.showDeleteModal = true;
+      component.deleteTargetId = '99';
+
+      actions$.next(deleteTradeSuccess({ id: '99' }));
+
+      expect(component.showDeleteModal).toBeFalse();
+      expect(component.deleteTargetId).toBeNull();
+      expect(dispatchSpy).toHaveBeenCalledWith(loadTrades({ page: 1, limit: DEFAULT_PAGE_SIZE }));
+    });
   });
 });
