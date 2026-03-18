@@ -15,6 +15,7 @@ import {
 } from './trades.actions';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
 import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
+import { PaginatedResponse, PaginationMetadata } from '../../core/models/paginated-response.model';
 
 const mockTrade: TradeOrder = {
   id: '1',
@@ -26,6 +27,18 @@ const mockTrade: TradeOrder = {
   status: OrderStatus.open,
   createdAt: new Date('2026-03-10'),
   updatedAt: new Date('2026-03-10'),
+};
+
+const mockPagination: PaginationMetadata = {
+  page: 1,
+  limit: 10,
+  total: 24,
+  totalPages: 3,
+};
+
+const mockResponse: PaginatedResponse<TradeOrder> = {
+  data: [mockTrade],
+  metadata: mockPagination,
 };
 
 describe('TradesEffects', () => {
@@ -49,15 +62,15 @@ describe('TradesEffects', () => {
   });
 
   describe('loadTrades$', () => {
-    it('should dispatch loadTradesSuccess when the service returns data', (done) => {
-      tradesServiceSpy.getTrades.and.returnValue(of([mockTrade]));
+    it('should dispatch loadTradesSuccess with trades and pagination when the service returns data', (done) => {
+      tradesServiceSpy.getTrades.and.returnValue(of(mockResponse));
 
       effects.loadTrades$.subscribe((action) => {
-        expect(action).toEqual(loadTradesSuccess({ trades: [mockTrade] }));
+        expect(action).toEqual(loadTradesSuccess({ trades: [mockTrade], pagination: mockPagination }));
         done();
       });
 
-      actions$.next(loadTrades());
+      actions$.next(loadTrades({ page: 1, limit: 10 }));
     });
 
     it('should dispatch loadTradesFailure when the service throws an error', (done) => {
@@ -71,18 +84,18 @@ describe('TradesEffects', () => {
         done();
       });
 
-      actions$.next(loadTrades());
+      actions$.next(loadTrades({ page: 1, limit: 10 }));
     });
 
-    it('should call TradesService.getTrades once per loadTrades action', (done) => {
-      tradesServiceSpy.getTrades.and.returnValue(of([mockTrade]));
+    it('should call TradesService.getTrades with the correct page and limit', (done) => {
+      tradesServiceSpy.getTrades.and.returnValue(of(mockResponse));
 
       effects.loadTrades$.subscribe(() => {
-        expect(tradesServiceSpy.getTrades).toHaveBeenCalledTimes(1);
+        expect(tradesServiceSpy.getTrades).toHaveBeenCalledWith(2, 10);
         done();
       });
 
-      actions$.next(loadTrades());
+      actions$.next(loadTrades({ page: 2, limit: 10 }));
     });
   });
 

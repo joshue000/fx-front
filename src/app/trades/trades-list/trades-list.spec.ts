@@ -3,12 +3,13 @@ import { Router, provideRouter } from '@angular/router';
 import { MemoizedSelector } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 
-import { TradesList } from './trades-list';
+import { TradesList, DEFAULT_PAGE_SIZE } from './trades-list';
 import { loadTrades } from '../store/trades.actions';
-import { selectTrades, selectTradesError, selectTradesLoading } from '../store/trades.selectors';
+import { selectTrades, selectTradesError, selectTradesLoading, selectTradesPagination } from '../store/trades.selectors';
 import { TradesState } from '../store/trades.state';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
 import { TRADES_FEATURE_KEY } from '../store/trades.selectors';
+import { PaginationMetadata } from '../../core/models/paginated-response.model';
 
 const mockTrade: TradeOrder = {
   id: '1',
@@ -22,9 +23,17 @@ const mockTrade: TradeOrder = {
   updatedAt: new Date('2026-03-10'),
 };
 
+const mockPagination: PaginationMetadata = {
+  page: 1,
+  limit: 10,
+  total: 24,
+  totalPages: 3,
+};
+
 const initialState: { [TRADES_FEATURE_KEY]: TradesState } = {
   [TRADES_FEATURE_KEY]: {
     trades: [],
+    pagination: null,
     loading: false,
     error: null,
     creating: false,
@@ -39,6 +48,7 @@ describe('TradesList', () => {
   let mockSelectTrades: MemoizedSelector<object, TradeOrder[]>;
   let mockSelectLoading: MemoizedSelector<object, boolean>;
   let mockSelectError: MemoizedSelector<object, string | null>;
+  let mockSelectPagination: MemoizedSelector<object, PaginationMetadata | null>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -53,6 +63,7 @@ describe('TradesList', () => {
     mockSelectTrades = store.overrideSelector(selectTrades, []);
     mockSelectLoading = store.overrideSelector(selectTradesLoading, false);
     mockSelectError = store.overrideSelector(selectTradesError, null);
+    mockSelectPagination = store.overrideSelector(selectTradesPagination, null);
 
     fixture = TestBed.createComponent(TradesList);
     component = fixture.componentInstance;
@@ -67,12 +78,12 @@ describe('TradesList', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch loadTrades on init', () => {
+  it('should dispatch loadTrades with page 1 and default limit on init', () => {
     const dispatchSpy = spyOn(store, 'dispatch');
 
     component.ngOnInit();
 
-    expect(dispatchSpy).toHaveBeenCalledWith(loadTrades());
+    expect(dispatchSpy).toHaveBeenCalledWith(loadTrades({ page: 1, limit: DEFAULT_PAGE_SIZE }));
   });
 
   it('should display the trades table when trades are available', async () => {
@@ -123,6 +134,36 @@ describe('TradesList', () => {
 
   it('should return the trade id from trackById', () => {
     expect(component.trackById(0, mockTrade)).toBe('1');
+  });
+
+  it('should dispatch loadTrades with the new page when onPageChange is called', () => {
+    const dispatchSpy = spyOn(store, 'dispatch');
+
+    component.onPageChange(3);
+
+    expect(dispatchSpy).toHaveBeenCalledWith(loadTrades({ page: 3, limit: DEFAULT_PAGE_SIZE }));
+  });
+
+  it('should show the pagination component when totalPages > 1', async () => {
+    mockSelectTrades.setResult([mockTrade]);
+    mockSelectPagination.setResult(mockPagination);
+    store.refreshState();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const pagination = fixture.nativeElement.querySelector('app-pagination');
+    expect(pagination).not.toBeNull();
+  });
+
+  it('should not show the pagination component when totalPages is 1', async () => {
+    mockSelectTrades.setResult([mockTrade]);
+    mockSelectPagination.setResult({ ...mockPagination, totalPages: 1 });
+    store.refreshState();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const pagination = fixture.nativeElement.querySelector('app-pagination');
+    expect(pagination).toBeNull();
   });
 
   it('should navigate to trade detail when goToDetail is called', () => {

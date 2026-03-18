@@ -55,5 +55,15 @@
         </tbody>
       </table>
     </div>
+
+    @if (pagination$ | async; as pagination) {
+      @if (pagination.totalPages > 1) {
+        <app-pagination
+          [currentPage]="pagination.page"
+          [totalPages]="pagination.totalPages"
+          (pageChange)="onPageChange($event)"
+        />
+      }
+    }
   }
 </section>

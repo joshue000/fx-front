@@ -10,6 +10,7 @@ import {
 } from './trades.actions';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
 import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
+import { PaginationMetadata } from '../../core/models/paginated-response.model';
 
 const mockTrade: TradeOrder = {
   id: '1',
@@ -21,6 +22,13 @@ const mockTrade: TradeOrder = {
   status: OrderStatus.open,
   createdAt: new Date('2026-03-10'),
   updatedAt: new Date('2026-03-10'),
+};
+
+const mockPagination: PaginationMetadata = {
+  page: 1,
+  limit: 10,
+  total: 24,
+  totalPages: 3,
 };
 
 describe('tradesReducer', () => {
@@ -38,7 +46,7 @@ describe('tradesReducer', () => {
         loading: false,
       };
 
-      const state = tradesReducer(previousState, loadTrades());
+      const state = tradesReducer(previousState, loadTrades({ page: 1, limit: 10 }));
 
       expect(state.loading).toBeTrue();
       expect(state.error).toBeNull();
@@ -50,19 +58,23 @@ describe('tradesReducer', () => {
         trades: [mockTrade],
       };
 
-      const state = tradesReducer(previousState, loadTrades());
+      const state = tradesReducer(previousState, loadTrades({ page: 1, limit: 10 }));
 
       expect(state.trades).toEqual([mockTrade]);
     });
   });
 
   describe('loadTradesSuccess', () => {
-    it('should set trades and set loading to false', () => {
+    it('should set trades, pagination and set loading to false', () => {
       const loadingState: TradesState = { ...initialTradesState, loading: true };
 
-      const state = tradesReducer(loadingState, loadTradesSuccess({ trades: [mockTrade] }));
+      const state = tradesReducer(
+        loadingState,
+        loadTradesSuccess({ trades: [mockTrade], pagination: mockPagination })
+      );
 
       expect(state.trades).toEqual([mockTrade]);
+      expect(state.pagination).toEqual(mockPagination);
       expect(state.loading).toBeFalse();
     });
 
@@ -76,7 +88,7 @@ describe('tradesReducer', () => {
 
       const state = tradesReducer(
         previousState,
-        loadTradesSuccess({ trades: [anotherTrade] })
+        loadTradesSuccess({ trades: [anotherTrade], pagination: mockPagination })
       );
 
       expect(state.trades).toEqual([anotherTrade]);

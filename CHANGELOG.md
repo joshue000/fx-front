@@ -6,6 +6,30 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.7] - 2026-03-17
+
+### Added
+- `PaginationMetadata` and `PaginatedResponse<T>` interfaces at `core/models/paginated-response.model.ts`
+- Reusable `Pagination` component at `shared/pagination/` — accepts `currentPage` and `totalPages` inputs, emits `pageChange` output; handles ellipsis rendering for large page ranges
+- `selectTradesPagination` selector to expose `PaginationMetadata | null` from state
+- Pagination rendered in `TradesList` only when `totalPages > 1`
+- `DEFAULT_PAGE_SIZE = 10` constant exported from `trades-list.ts`
+
+### Changed
+- `TradesService.getTrades(page, limit)` now returns `Observable<PaginatedResponse<TradeOrder>>` and sends `page` / `limit` as query params
+- `loadTrades` action now requires `{ page: number; limit: number }` props
+- `loadTradesSuccess` action now carries `{ trades, pagination }` instead of just `{ trades }`
+- `TradesState` extended with `pagination: PaginationMetadata | null`
+- `tradesReducer` stores pagination metadata on `loadTradesSuccess`
+- `TradesEffects.loadTrades$` passes page/limit to service and maps `response.data` / `response.metadata`
+- `TradesList` dispatches `loadTrades({ page: 1, limit: DEFAULT_PAGE_SIZE })` on init; handles `onPageChange` by re-dispatching with new page
+- All affected spec files updated to reflect new signatures and assertions
+
+### Fixed
+- Resolved `TypeError: newCollection[Symbol.iterator] is not a function` — caused by the API returning a wrapped `{ data, metadata }` object instead of a plain array
+
+---
+
 ## [0.0.6] - 2026-03-17
 
 ### Changed

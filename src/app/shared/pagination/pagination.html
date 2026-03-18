@@ -1,0 +1,37 @@
+<nav class="pagination" aria-label="Pagination">
+  <button
+    class="pagination__btn pagination__btn--nav"
+    [class.pagination__btn--disabled]="!hasPrevious"
+    [disabled]="!hasPrevious"
+    (click)="previous()"
+    aria-label="Previous page"
+  >
+    ‹
+  </button>
+
+  @for (page of pages; track $index) {
+    @if (page === '...') {
+      <span class="pagination__ellipsis">…</span>
+    } @else {
+      <button
+        class="pagination__btn"
+        [class.pagination__btn--active]="page === currentPage"
+        (click)="goTo(page)"
+        [attr.aria-current]="page === currentPage ? 'page' : null"
+        [attr.aria-label]="'Page ' + page"
+      >
+        {{ page }}
+      </button>
+    }
+  }
+
+  <button
+    class="pagination__btn pagination__btn--nav"
+    [class.pagination__btn--disabled]="!hasNext"
+    [disabled]="!hasNext"
+    (click)="next()"
+    aria-label="Next page"
+  >
+    ›
+  </button>
+</nav>

@@ -1,6 +1,7 @@
-import { selectTrades, selectTradesError, selectTradesLoading, TRADES_FEATURE_KEY } from './trades.selectors';
+import { selectTrades, selectTradesError, selectTradesLoading, selectTradesPagination, TRADES_FEATURE_KEY } from './trades.selectors';
 import { TradesState } from './trades.state';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
+import { PaginationMetadata } from '../../core/models/paginated-response.model';
 
 const mockTrade: TradeOrder = {
   id: '1',
@@ -14,9 +15,17 @@ const mockTrade: TradeOrder = {
   updatedAt: new Date('2026-03-10'),
 };
 
+const mockPagination: PaginationMetadata = {
+  page: 2,
+  limit: 10,
+  total: 24,
+  totalPages: 3,
+};
+
 const buildState = (slice: Partial<TradesState>): { [TRADES_FEATURE_KEY]: TradesState } => ({
   [TRADES_FEATURE_KEY]: {
     trades: [],
+    pagination: null,
     loading: false,
     error: null,
     creating: false,
@@ -59,6 +68,18 @@ describe('Trades Selectors', () => {
     it('should return null when there is no error', () => {
       const state = buildState({ error: null });
       expect(selectTradesError(state)).toBeNull();
+    });
+  });
+
+  describe('selectTradesPagination', () => {
+    it('should return the pagination metadata when available', () => {
+      const state = buildState({ pagination: mockPagination });
+      expect(selectTradesPagination(state)).toEqual(mockPagination);
+    });
+
+    it('should return null when pagination is not yet loaded', () => {
+      const state = buildState({ pagination: null });
+      expect(selectTradesPagination(state)).toBeNull();
     });
   });
 });

@@ -15,6 +15,7 @@ import { OrderSide, OrderStatus, OrderType } from '../../core/models/trade-order
 const initialState: { [TRADES_FEATURE_KEY]: TradesState } = {
   [TRADES_FEATURE_KEY]: {
     trades: [],
+    pagination: null,
     loading: false,
     error: null,
     creating: false,

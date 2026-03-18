@@ -17,9 +17,10 @@ export const tradesReducer = createReducer<TradesState>(
     loading: true,
     error: null,
   })),
-  on(loadTradesSuccess, (state, { trades }): TradesState => ({
+  on(loadTradesSuccess, (state, { trades, pagination }): TradesState => ({
     ...state,
     trades,
+    pagination,
     loading: false,
   })),
   on(loadTradesFailure, (state, { error }): TradesState => ({

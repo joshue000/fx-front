@@ -20,9 +20,9 @@ export class TradesEffects {
   loadTrades$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loadTrades),
-      switchMap(() =>
-        this.tradesService.getTrades().pipe(
-          map(trades => loadTradesSuccess({ trades })),
+      switchMap(({ page, limit }) =>
+        this.tradesService.getTrades(page, limit).pipe(
+          map(response => loadTradesSuccess({ trades: response.data, pagination: response.metadata })),
           catchError(error => of(loadTradesFailure({ error: error.message })))
         )
       )

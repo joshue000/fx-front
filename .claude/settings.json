@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --node-options=--no-warnings ng test --watch=false --browsers=ChromeHeadless)",
+      "Bash(npx -y karma-cli start karma.conf.js --single-run)",
+      "Bash(node node_modules/.bin/ng test --watch=false --browsers=ChromeHeadless)"
+    ]
+  }
+}

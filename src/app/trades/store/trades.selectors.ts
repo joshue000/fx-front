@@ -21,6 +21,11 @@ export const selectTradesError = createSelector(
   state => state.error
 );
 
+export const selectTradesPagination = createSelector(
+  selectTradesState,
+  state => state.pagination
+);
+
 export const selectTradesCreating = createSelector(
   selectTradesState,
   state => state.creating

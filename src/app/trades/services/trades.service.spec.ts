@@ -5,6 +5,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TradesService } from './trades.service';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
 import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
+import { PaginatedResponse, PaginationMetadata } from '../../core/models/paginated-response.model';
 import { environment } from '../../../environments/environment';
 
 const mockTrades: TradeOrder[] = [
@@ -32,11 +33,23 @@ const mockTrades: TradeOrder[] = [
   },
 ];
 
+const mockPagination: PaginationMetadata = {
+  page: 1,
+  limit: 10,
+  total: 24,
+  totalPages: 3,
+};
+
+const mockResponse: PaginatedResponse<TradeOrder> = {
+  data: mockTrades,
+  metadata: mockPagination,
+};
+
 describe('TradesService', () => {
   let service: TradesService;
   let httpController: HttpTestingController;
 
-  const expectedUrl = `${environment.apiUrl}/trade_orders`;
+  const baseUrl = `${environment.apiUrl}/trade_orders`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -56,31 +69,33 @@ describe('TradesService', () => {
   });
 
   describe('getTrades', () => {
-    it('should perform a GET request to the trade_orders endpoint', () => {
-      service.getTrades().subscribe();
+    it('should perform a GET request with page and limit query params', () => {
+      service.getTrades(1, 10).subscribe();
 
-      const req = httpController.expectOne(expectedUrl);
+      const req = httpController.expectOne(r => r.url === baseUrl);
       expect(req.request.method).toBe('GET');
+      expect(req.request.params.get('page')).toBe('1');
+      expect(req.request.params.get('limit')).toBe('10');
 
-      req.flush([]);
+      req.flush(mockResponse);
     });
 
-    it('should return the list of trades from the API', (done) => {
-      service.getTrades().subscribe((trades) => {
-        expect(trades).toEqual(mockTrades);
+    it('should return the paginated response from the API', (done) => {
+      service.getTrades(1, 10).subscribe((response) => {
+        expect(response).toEqual(mockResponse);
         done();
       });
 
-      httpController.expectOne(expectedUrl).flush(mockTrades);
+      httpController.expectOne(r => r.url === baseUrl).flush(mockResponse);
     });
 
-    it('should return an empty array when the API responds with no trades', (done) => {
-      service.getTrades().subscribe((trades) => {
-        expect(trades).toEqual([]);
-        done();
-      });
+    it('should pass the correct page number to the request', () => {
+      service.getTrades(3, 10).subscribe();
 
-      httpController.expectOne(expectedUrl).flush([]);
+      const req = httpController.expectOne(r => r.url === baseUrl);
+      expect(req.request.params.get('page')).toBe('3');
+
+      req.flush({ data: [], metadata: { ...mockPagination, page: 3 } });
     });
   });
 
@@ -108,7 +123,7 @@ describe('TradesService', () => {
     it('should perform a POST request to the trade_orders endpoint', () => {
       service.createTrade(mockDto).subscribe();
 
-      const req = httpController.expectOne(expectedUrl);
+      const req = httpController.expectOne(baseUrl);
       expect(req.request.method).toBe('POST');
 
       req.flush(createdTrade);
@@ -117,7 +132,7 @@ describe('TradesService', () => {
     it('should send the DTO as the request body', () => {
       service.createTrade(mockDto).subscribe();
 
-      const req = httpController.expectOne(expectedUrl);
+      const req = httpController.expectOne(baseUrl);
       expect(req.request.body).toEqual(mockDto);
 
       req.flush(createdTrade);
@@ -129,7 +144,7 @@ describe('TradesService', () => {
         done();
       });
 
-      httpController.expectOne(expectedUrl).flush(createdTrade);
+      httpController.expectOne(baseUrl).flush(createdTrade);
     });
   });
 });

@@ -2,12 +2,16 @@ import { createAction, props } from '@ngrx/store';
 
 import { TradeOrder } from '../../core/models/trade-order.model';
 import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
+import { PaginationMetadata } from '../../core/models/paginated-response.model';
 
-export const loadTrades = createAction('[Trades] Load Trades');
+export const loadTrades = createAction(
+  '[Trades] Load Trades',
+  props<{ page: number; limit: number }>()
+);
 
 export const loadTradesSuccess = createAction(
   '[Trades] Load Trades Success',
-  props<{ trades: TradeOrder[] }>()
+  props<{ trades: TradeOrder[]; pagination: PaginationMetadata }>()
 );
 
 export const loadTradesFailure = createAction(
