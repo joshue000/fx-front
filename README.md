@@ -37,10 +37,10 @@ The app expects the backend API at `http://localhost:3000/api/v1/`.
 
 ### Start
 
-Make the scripts executable (only needed once):
+Make the scripts executable (only needed once, run from the project root directory):
 
 ```bash
-chmod +x start.sh stop.sh
+chmod +x ./start.sh ./stop.sh
 ```
 
 Builds the production image and starts the container on port **4200**:
