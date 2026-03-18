@@ -8,9 +8,9 @@ import { Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { OrderSide, OrderStatus, OrderType } from '../../core/models/trade-order.model';
-import { CreateTradeOrderDto } from '../../core/dtos/create-trade-order.dto';
-import { createOrder, createOrderSuccess } from '../../orders/store/orders.actions';
-import { selectOrdersCreateError, selectOrdersCreating } from '../../orders/store/orders.selectors';
+import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
+import { createTrade, createTradeSuccess } from '../store/trades.actions';
+import { selectTradesCreateError, selectTradesCreating } from '../store/trades.selectors';
 
 @Component({
   selector: 'app-trade-form',
@@ -24,8 +24,8 @@ export class TradeForm {
   private readonly fb = inject(FormBuilder);
   private readonly actions$ = inject(Actions);
 
-  readonly creating$: Observable<boolean> = this.store.select(selectOrdersCreating);
-  readonly createError$: Observable<string | null> = this.store.select(selectOrdersCreateError);
+  readonly creating$: Observable<boolean> = this.store.select(selectTradesCreating);
+  readonly createError$: Observable<string | null> = this.store.select(selectTradesCreateError);
 
   readonly orderSides = Object.values(OrderSide);
   readonly orderTypes = Object.values(OrderType);
@@ -42,7 +42,7 @@ export class TradeForm {
 
   constructor() {
     this.actions$
-      .pipe(ofType(createOrderSuccess), takeUntilDestroyed())
+      .pipe(ofType(createTradeSuccess), takeUntilDestroyed())
       .subscribe(() => this.router.navigate(['/trades']));
   }
 
@@ -54,7 +54,7 @@ export class TradeForm {
 
     const { pair, side, type, amount, price, status } = this.form.getRawValue();
 
-    const dto: CreateTradeOrderDto = {
+    const dto: CreateTradeDto = {
       pair: pair!,
       side: side as OrderSide,
       type: type as OrderType,
@@ -63,7 +63,7 @@ export class TradeForm {
       ...(status ? { status: status as OrderStatus } : {}),
     };
 
-    this.store.dispatch(createOrder({ dto }));
+    this.store.dispatch(createTrade({ dto }));
   }
 
   goBack(): void {

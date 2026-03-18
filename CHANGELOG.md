@@ -6,6 +6,24 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.6] - 2026-03-17
+
+### Changed
+- Renamed all `orders`-related identifiers to `trades` throughout the frontend codebase
+- Moved `orders/orders-list/` → `trades/trades-list/` (`OrdersList` → `TradesList`, selector `app-trades-list`)
+- Moved `orders/order-detail/` → `trades/trade-detail/` (`OrderDetail` → `TradeDetail`, selector `app-trade-detail`)
+- Moved `orders/services/orders.service.ts` → `trades/services/trades.service.ts` (`OrdersService` → `TradesService`, methods `getTrades` / `createTrade`)
+- Moved `orders/store/` → `trades/store/` with renamed files (`trades.state.ts`, `trades.actions.ts`, `trades.selectors.ts`, `trades.reducer.ts`, `trades.effects.ts`)
+- Renamed NgRx identifiers: `ORDERS_FEATURE_KEY` → `TRADES_FEATURE_KEY` (value `'trades'`), `OrdersState` → `TradesState`, `ordersReducer` → `tradesReducer`, `OrdersEffects` → `TradesEffects`
+- Renamed actions: `loadOrders/Success/Failure` → `loadTrades/Success/Failure`, `createOrder/Success/Failure` → `createTrade/Success/Failure`
+- Renamed selectors: `selectOrders*` → `selectTrades*`
+- Renamed `CreateTradeOrderDto` → `CreateTradeDto` (`core/dtos/create-trade.dto.ts`)
+- Updated `app.config.ts` and `app.routes.ts` to point to new `trades/` paths and identifiers
+- Updated all spec files to reflect new class names, selectors, actions, and CSS class names
+- CSS classes renamed: `.orders-*` → `.trades-*`, `.order-detail*` → `.trade-detail*`
+
+---
+
 ## [0.0.5] - 2026-03-17
 
 ### Added

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, provideRouter } from '@angular/router';
 
-import { OrderDetail } from './order-detail';
+import { TradeDetail } from './trade-detail';
 
 const buildActivatedRoute = (id: string | null) => ({
   snapshot: {
@@ -11,21 +11,21 @@ const buildActivatedRoute = (id: string | null) => ({
   },
 });
 
-describe('OrderDetail', () => {
+describe('TradeDetail', () => {
   describe('with a valid route id', () => {
-    let component: OrderDetail;
-    let fixture: ComponentFixture<OrderDetail>;
+    let component: TradeDetail;
+    let fixture: ComponentFixture<TradeDetail>;
 
     beforeEach(async () => {
       await TestBed.configureTestingModule({
-        imports: [OrderDetail],
+        imports: [TradeDetail],
         providers: [
           provideRouter([]),
           { provide: ActivatedRoute, useValue: buildActivatedRoute('42') },
         ],
       }).compileComponents();
 
-      fixture = TestBed.createComponent(OrderDetail);
+      fixture = TestBed.createComponent(TradeDetail);
       component = fixture.componentInstance;
       fixture.detectChanges();
     });
@@ -34,16 +34,16 @@ describe('OrderDetail', () => {
       expect(component).toBeTruthy();
     });
 
-    it('should read the order id from the route params', () => {
-      expect(component['orderId']()).toBe('42');
+    it('should read the trade id from the route params', () => {
+      expect(component['tradeId']()).toBe('42');
     });
 
-    it('should render the order id in the template', () => {
-      const idElement = fixture.nativeElement.querySelector('.order-detail__id');
+    it('should render the trade id in the template', () => {
+      const idElement = fixture.nativeElement.querySelector('.trade-detail__id');
       expect(idElement.textContent.trim()).toBe('ID: 42');
     });
 
-    it('should navigate back to orders list when goBack is called', () => {
+    it('should navigate back to trades list when goBack is called', () => {
       const router = TestBed.inject(Router);
       spyOn(router, 'navigate');
 
@@ -54,25 +54,25 @@ describe('OrderDetail', () => {
   });
 
   describe('with a null route id', () => {
-    let component: OrderDetail;
-    let fixture: ComponentFixture<OrderDetail>;
+    let component: TradeDetail;
+    let fixture: ComponentFixture<TradeDetail>;
 
     beforeEach(async () => {
       await TestBed.configureTestingModule({
-        imports: [OrderDetail],
+        imports: [TradeDetail],
         providers: [
           provideRouter([]),
           { provide: ActivatedRoute, useValue: buildActivatedRoute(null) },
         ],
       }).compileComponents();
 
-      fixture = TestBed.createComponent(OrderDetail);
+      fixture = TestBed.createComponent(TradeDetail);
       component = fixture.componentInstance;
       fixture.detectChanges();
     });
 
-    it('should default orderId to empty string when param is null', () => {
-      expect(component['orderId']()).toBe('');
+    it('should default tradeId to empty string when param is null', () => {
+      expect(component['tradeId']()).toBe('');
     });
   });
 });

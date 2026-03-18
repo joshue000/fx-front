@@ -1,0 +1,59 @@
+<section class="trades-page">
+  <header class="trades-page__header">
+    <h1 class="trades-page__title">Trades</h1>
+    <button class="btn btn--primary" (click)="goToCreate()">+ New Trade</button>
+  </header>
+
+  @if (error$ | async; as error) {
+    <div class="trades-error">{{ error }}</div>
+  }
+
+  @if (loading$ | async) {
+    <div class="trades-loading">Loading trades...</div>
+  } @else if (trades$ | async; as trades) {
+    <div class="trades-table-wrapper">
+      <table class="trades-table">
+        <thead>
+          <tr>
+            <th>Pair</th>
+            <th>Side</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (trade of trades; track trackById($index, trade)) {
+            <tr class="trades-table__row">
+              <td class="trades-table__pair">{{ trade.pair }}</td>
+              <td>
+                <span class="badge badge--side badge--{{ trade.side }}">
+                  {{ trade.side | uppercase }}
+                </span>
+              </td>
+              <td class="trades-table__type">{{ trade.type | uppercase }}</td>
+              <td class="trades-table__amount">{{ trade.amount }}</td>
+              <td class="trades-table__price">${{ trade.price }}</td>
+              <td>
+                <span class="badge badge--status badge--{{ trade.status }}">
+                  {{ trade.status | uppercase }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn--outline btn--sm" (click)="goToDetail(trade.id)">
+                  View Details
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="trades-table__empty">No trades found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

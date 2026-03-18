@@ -2,7 +2,7 @@
   display: block;
 }
 
-.orders-page {
+.trades-page {
   padding: 2rem;
   max-width: 1100px;
   margin: 0 auto;
@@ -22,13 +22,13 @@
   }
 }
 
-.orders-table-wrapper {
+.trades-table-wrapper {
   overflow-x: auto;
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-.orders-table {
+.trades-table {
   width: 100%;
   border-collapse: collapse;
   background: #ffffff;

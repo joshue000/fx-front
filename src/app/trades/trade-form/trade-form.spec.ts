@@ -6,15 +6,15 @@ import { provideMockActions } from '@ngrx/effects/testing';
 import { ReplaySubject } from 'rxjs';
 
 import { TradeForm } from './trade-form';
-import { createOrder, createOrderSuccess } from '../../orders/store/orders.actions';
-import { selectOrdersCreateError, selectOrdersCreating } from '../../orders/store/orders.selectors';
-import { OrdersState } from '../../orders/store/orders.state';
-import { ORDERS_FEATURE_KEY } from '../../orders/store/orders.selectors';
+import { createTrade, createTradeSuccess } from '../store/trades.actions';
+import { selectTradesCreateError, selectTradesCreating } from '../store/trades.selectors';
+import { TradesState } from '../store/trades.state';
+import { TRADES_FEATURE_KEY } from '../store/trades.selectors';
 import { OrderSide, OrderStatus, OrderType } from '../../core/models/trade-order.model';
 
-const initialState: { [ORDERS_FEATURE_KEY]: OrdersState } = {
-  [ORDERS_FEATURE_KEY]: {
-    orders: [],
+const initialState: { [TRADES_FEATURE_KEY]: TradesState } = {
+  [TRADES_FEATURE_KEY]: {
+    trades: [],
     loading: false,
     error: null,
     creating: false,
@@ -43,8 +43,8 @@ describe('TradeForm', () => {
     }).compileComponents();
 
     store = TestBed.inject(MockStore);
-    mockSelectCreating = store.overrideSelector(selectOrdersCreating, false);
-    mockSelectCreateError = store.overrideSelector(selectOrdersCreateError, null);
+    mockSelectCreating = store.overrideSelector(selectTradesCreating, false);
+    mockSelectCreateError = store.overrideSelector(selectTradesCreateError, null);
 
     fixture = TestBed.createComponent(TradeForm);
     component = fixture.componentInstance;
@@ -126,7 +126,7 @@ describe('TradeForm', () => {
       expect(dispatchSpy).not.toHaveBeenCalled();
     });
 
-    it('should dispatch createOrder with the correct DTO when the form is valid', () => {
+    it('should dispatch createTrade with the correct DTO when the form is valid', () => {
       const dispatchSpy = spyOn(store, 'dispatch');
 
       component.form.setValue({
@@ -141,7 +141,7 @@ describe('TradeForm', () => {
       component.onSubmit();
 
       expect(dispatchSpy).toHaveBeenCalledWith(
-        createOrder({
+        createTrade({
           dto: {
             pair: 'EUR/USD',
             side: OrderSide.buy,
@@ -167,7 +167,7 @@ describe('TradeForm', () => {
 
       component.onSubmit();
 
-      const dispatchedAction = dispatchSpy.calls.mostRecent().args[0] as unknown as ReturnType<typeof createOrder>;
+      const dispatchedAction = dispatchSpy.calls.mostRecent().args[0] as unknown as ReturnType<typeof createTrade>;
       expect(dispatchedAction.dto.status).toBe(OrderStatus.open);
     });
   });
@@ -182,11 +182,11 @@ describe('TradeForm', () => {
       expect(router.navigate).toHaveBeenCalledWith(['/trades']);
     });
 
-    it('should navigate to /trades after createOrderSuccess action', () => {
+    it('should navigate to /trades after createTradeSuccess action', () => {
       const router = TestBed.inject(Router);
       spyOn(router, 'navigate');
 
-      actions$.next(createOrderSuccess({ order: {} as any }));
+      actions$.next(createTradeSuccess({ trade: {} as any }));
 
       expect(router.navigate).toHaveBeenCalledWith(['/trades']);
     });

@@ -2,12 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { OrdersService } from './orders.service';
+import { TradesService } from './trades.service';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
-import { CreateTradeOrderDto } from '../../core/dtos/create-trade-order.dto';
+import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
 import { environment } from '../../../environments/environment';
 
-const mockOrders: TradeOrder[] = [
+const mockTrades: TradeOrder[] = [
   {
     id: '1',
     pair: 'EUR/USD',
@@ -32,8 +32,8 @@ const mockOrders: TradeOrder[] = [
   },
 ];
 
-describe('OrdersService', () => {
-  let service: OrdersService;
+describe('TradesService', () => {
+  let service: TradesService;
   let httpController: HttpTestingController;
 
   const expectedUrl = `${environment.apiUrl}/trade_orders`;
@@ -43,7 +43,7 @@ describe('OrdersService', () => {
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
 
-    service = TestBed.inject(OrdersService);
+    service = TestBed.inject(TradesService);
     httpController = TestBed.inject(HttpTestingController);
   });
 
@@ -55,9 +55,9 @@ describe('OrdersService', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('getOrders', () => {
+  describe('getTrades', () => {
     it('should perform a GET request to the trade_orders endpoint', () => {
-      service.getOrders().subscribe();
+      service.getTrades().subscribe();
 
       const req = httpController.expectOne(expectedUrl);
       expect(req.request.method).toBe('GET');
@@ -65,18 +65,18 @@ describe('OrdersService', () => {
       req.flush([]);
     });
 
-    it('should return the list of trade orders from the API', (done) => {
-      service.getOrders().subscribe((orders) => {
-        expect(orders).toEqual(mockOrders);
+    it('should return the list of trades from the API', (done) => {
+      service.getTrades().subscribe((trades) => {
+        expect(trades).toEqual(mockTrades);
         done();
       });
 
-      httpController.expectOne(expectedUrl).flush(mockOrders);
+      httpController.expectOne(expectedUrl).flush(mockTrades);
     });
 
-    it('should return an empty array when the API responds with no orders', (done) => {
-      service.getOrders().subscribe((orders) => {
-        expect(orders).toEqual([]);
+    it('should return an empty array when the API responds with no trades', (done) => {
+      service.getTrades().subscribe((trades) => {
+        expect(trades).toEqual([]);
         done();
       });
 
@@ -84,8 +84,8 @@ describe('OrdersService', () => {
     });
   });
 
-  describe('createOrder', () => {
-    const mockDto: CreateTradeOrderDto = {
+  describe('createTrade', () => {
+    const mockDto: CreateTradeDto = {
       pair: 'EUR/USD',
       side: OrderSide.buy,
       type: OrderType.limit,
@@ -93,7 +93,7 @@ describe('OrdersService', () => {
       price: 1.085,
     };
 
-    const createdOrder: TradeOrder = {
+    const createdTrade: TradeOrder = {
       id: '99',
       pair: 'EUR/USD',
       side: OrderSide.buy,
@@ -106,30 +106,30 @@ describe('OrdersService', () => {
     };
 
     it('should perform a POST request to the trade_orders endpoint', () => {
-      service.createOrder(mockDto).subscribe();
+      service.createTrade(mockDto).subscribe();
 
       const req = httpController.expectOne(expectedUrl);
       expect(req.request.method).toBe('POST');
 
-      req.flush(createdOrder);
+      req.flush(createdTrade);
     });
 
     it('should send the DTO as the request body', () => {
-      service.createOrder(mockDto).subscribe();
+      service.createTrade(mockDto).subscribe();
 
       const req = httpController.expectOne(expectedUrl);
       expect(req.request.body).toEqual(mockDto);
 
-      req.flush(createdOrder);
+      req.flush(createdTrade);
     });
 
-    it('should return the created trade order from the API', (done) => {
-      service.createOrder(mockDto).subscribe((order) => {
-        expect(order).toEqual(createdOrder);
+    it('should return the created trade from the API', (done) => {
+      service.createTrade(mockDto).subscribe((trade) => {
+        expect(trade).toEqual(createdTrade);
         done();
       });
 
-      httpController.expectOne(expectedUrl).flush(createdOrder);
+      httpController.expectOne(expectedUrl).flush(createdTrade);
     });
   });
 });

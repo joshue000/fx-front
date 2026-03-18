@@ -1,0 +1,134 @@
+import { TestBed } from '@angular/core/testing';
+import { Action } from '@ngrx/store';
+import { provideMockActions } from '@ngrx/effects/testing';
+import { ReplaySubject, of, throwError } from 'rxjs';
+
+import { TradesEffects } from './trades.effects';
+import { TradesService } from '../services/trades.service';
+import {
+  createTrade,
+  createTradeFailure,
+  createTradeSuccess,
+  loadTrades,
+  loadTradesFailure,
+  loadTradesSuccess,
+} from './trades.actions';
+import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
+import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
+
+const mockTrade: TradeOrder = {
+  id: '1',
+  pair: 'EUR/USD',
+  side: OrderSide.buy,
+  type: OrderType.limit,
+  amount: '10000',
+  price: '1.0850',
+  status: OrderStatus.open,
+  createdAt: new Date('2026-03-10'),
+  updatedAt: new Date('2026-03-10'),
+};
+
+describe('TradesEffects', () => {
+  let actions$: ReplaySubject<Action>;
+  let effects: TradesEffects;
+  let tradesServiceSpy: jasmine.SpyObj<TradesService>;
+
+  beforeEach(() => {
+    actions$ = new ReplaySubject<Action>(1);
+    tradesServiceSpy = jasmine.createSpyObj<TradesService>('TradesService', ['getTrades', 'createTrade']);
+
+    TestBed.configureTestingModule({
+      providers: [
+        TradesEffects,
+        provideMockActions(() => actions$),
+        { provide: TradesService, useValue: tradesServiceSpy },
+      ],
+    });
+
+    effects = TestBed.inject(TradesEffects);
+  });
+
+  describe('loadTrades$', () => {
+    it('should dispatch loadTradesSuccess when the service returns data', (done) => {
+      tradesServiceSpy.getTrades.and.returnValue(of([mockTrade]));
+
+      effects.loadTrades$.subscribe((action) => {
+        expect(action).toEqual(loadTradesSuccess({ trades: [mockTrade] }));
+        done();
+      });
+
+      actions$.next(loadTrades());
+    });
+
+    it('should dispatch loadTradesFailure when the service throws an error', (done) => {
+      const errorMessage = 'Http failure response';
+      tradesServiceSpy.getTrades.and.returnValue(
+        throwError(() => new Error(errorMessage))
+      );
+
+      effects.loadTrades$.subscribe((action) => {
+        expect(action).toEqual(loadTradesFailure({ error: errorMessage }));
+        done();
+      });
+
+      actions$.next(loadTrades());
+    });
+
+    it('should call TradesService.getTrades once per loadTrades action', (done) => {
+      tradesServiceSpy.getTrades.and.returnValue(of([mockTrade]));
+
+      effects.loadTrades$.subscribe(() => {
+        expect(tradesServiceSpy.getTrades).toHaveBeenCalledTimes(1);
+        done();
+      });
+
+      actions$.next(loadTrades());
+    });
+  });
+
+  describe('createTrade$', () => {
+    const mockDto: CreateTradeDto = {
+      pair: 'EUR/USD',
+      side: OrderSide.buy,
+      type: OrderType.limit,
+      amount: 10000,
+      price: 1.085,
+    };
+
+    it('should dispatch createTradeSuccess when the service returns the created trade', (done) => {
+      tradesServiceSpy.createTrade.and.returnValue(of(mockTrade));
+
+      effects.createTrade$.subscribe((action) => {
+        expect(action).toEqual(createTradeSuccess({ trade: mockTrade }));
+        done();
+      });
+
+      actions$.next(createTrade({ dto: mockDto }));
+    });
+
+    it('should dispatch createTradeFailure when the service throws an error', (done) => {
+      const errorMessage = 'Validation failed';
+      tradesServiceSpy.createTrade.and.returnValue(
+        throwError(() => new Error(errorMessage))
+      );
+
+      effects.createTrade$.subscribe((action) => {
+        expect(action).toEqual(createTradeFailure({ error: errorMessage }));
+        done();
+      });
+
+      actions$.next(createTrade({ dto: mockDto }));
+    });
+
+    it('should call TradesService.createTrade with the provided DTO', (done) => {
+      tradesServiceSpy.createTrade.and.returnValue(of(mockTrade));
+
+      effects.createTrade$.subscribe(() => {
+        expect(tradesServiceSpy.createTrade).toHaveBeenCalledWith(mockDto);
+        done();
+      });
+
+      actions$.next(createTrade({ dto: mockDto }));
+    });
+  });
+});

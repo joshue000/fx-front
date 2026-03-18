@@ -3,14 +3,14 @@ import { Router, provideRouter } from '@angular/router';
 import { MemoizedSelector } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 
-import { OrdersList } from './orders-list';
-import { loadOrders } from '../store/orders.actions';
-import { selectOrders, selectOrdersError, selectOrdersLoading } from '../store/orders.selectors';
-import { OrdersState } from '../store/orders.state';
+import { TradesList } from './trades-list';
+import { loadTrades } from '../store/trades.actions';
+import { selectTrades, selectTradesError, selectTradesLoading } from '../store/trades.selectors';
+import { TradesState } from '../store/trades.state';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
-import { ORDERS_FEATURE_KEY } from '../store/orders.selectors';
+import { TRADES_FEATURE_KEY } from '../store/trades.selectors';
 
-const mockOrder: TradeOrder = {
+const mockTrade: TradeOrder = {
   id: '1',
   pair: 'EUR/USD',
   side: OrderSide.buy,
@@ -22,9 +22,9 @@ const mockOrder: TradeOrder = {
   updatedAt: new Date('2026-03-10'),
 };
 
-const initialState: { [ORDERS_FEATURE_KEY]: OrdersState } = {
-  [ORDERS_FEATURE_KEY]: {
-    orders: [],
+const initialState: { [TRADES_FEATURE_KEY]: TradesState } = {
+  [TRADES_FEATURE_KEY]: {
+    trades: [],
     loading: false,
     error: null,
     creating: false,
@@ -32,17 +32,17 @@ const initialState: { [ORDERS_FEATURE_KEY]: OrdersState } = {
   },
 };
 
-describe('OrdersList', () => {
-  let component: OrdersList;
-  let fixture: ComponentFixture<OrdersList>;
+describe('TradesList', () => {
+  let component: TradesList;
+  let fixture: ComponentFixture<TradesList>;
   let store: MockStore;
-  let mockSelectOrders: MemoizedSelector<object, TradeOrder[]>;
+  let mockSelectTrades: MemoizedSelector<object, TradeOrder[]>;
   let mockSelectLoading: MemoizedSelector<object, boolean>;
   let mockSelectError: MemoizedSelector<object, string | null>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [OrdersList],
+      imports: [TradesList],
       providers: [
         provideRouter([]),
         provideMockStore({ initialState }),
@@ -50,11 +50,11 @@ describe('OrdersList', () => {
     }).compileComponents();
 
     store = TestBed.inject(MockStore);
-    mockSelectOrders = store.overrideSelector(selectOrders, []);
-    mockSelectLoading = store.overrideSelector(selectOrdersLoading, false);
-    mockSelectError = store.overrideSelector(selectOrdersError, null);
+    mockSelectTrades = store.overrideSelector(selectTrades, []);
+    mockSelectLoading = store.overrideSelector(selectTradesLoading, false);
+    mockSelectError = store.overrideSelector(selectTradesError, null);
 
-    fixture = TestBed.createComponent(OrdersList);
+    fixture = TestBed.createComponent(TradesList);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -67,24 +67,24 @@ describe('OrdersList', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch loadOrders on init', () => {
+  it('should dispatch loadTrades on init', () => {
     const dispatchSpy = spyOn(store, 'dispatch');
 
     component.ngOnInit();
 
-    expect(dispatchSpy).toHaveBeenCalledWith(loadOrders());
+    expect(dispatchSpy).toHaveBeenCalledWith(loadTrades());
   });
 
-  it('should display the orders table when orders are available', async () => {
-    mockSelectOrders.setResult([mockOrder]);
+  it('should display the trades table when trades are available', async () => {
+    mockSelectTrades.setResult([mockTrade]);
     mockSelectLoading.setResult(false);
     store.refreshState();
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const rows = fixture.nativeElement.querySelectorAll('.orders-table__row');
+    const rows = fixture.nativeElement.querySelectorAll('.trades-table__row');
     expect(rows.length).toBe(1);
-    expect(rows[0].querySelector('.orders-table__pair').textContent.trim()).toBe('EUR/USD');
+    expect(rows[0].querySelector('.trades-table__pair').textContent.trim()).toBe('EUR/USD');
   });
 
   it('should display the loading indicator when loading is true', async () => {
@@ -93,39 +93,39 @@ describe('OrdersList', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const loading = fixture.nativeElement.querySelector('.orders-loading');
+    const loading = fixture.nativeElement.querySelector('.trades-loading');
     expect(loading).not.toBeNull();
-    expect(loading.textContent.trim()).toBe('Loading orders...');
+    expect(loading.textContent.trim()).toBe('Loading trades...');
   });
 
   it('should display the error message when an error exists', async () => {
-    mockSelectError.setResult('Failed to load orders');
+    mockSelectError.setResult('Failed to load trades');
     store.refreshState();
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const error = fixture.nativeElement.querySelector('.orders-error');
+    const error = fixture.nativeElement.querySelector('.trades-error');
     expect(error).not.toBeNull();
-    expect(error.textContent.trim()).toBe('Failed to load orders');
+    expect(error.textContent.trim()).toBe('Failed to load trades');
   });
 
-  it('should display the empty state when orders list is empty', async () => {
-    mockSelectOrders.setResult([]);
+  it('should display the empty state when trades list is empty', async () => {
+    mockSelectTrades.setResult([]);
     mockSelectLoading.setResult(false);
     store.refreshState();
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const emptyCell = fixture.nativeElement.querySelector('.orders-table__empty');
+    const emptyCell = fixture.nativeElement.querySelector('.trades-table__empty');
     expect(emptyCell).not.toBeNull();
-    expect(emptyCell.textContent.trim()).toBe('No orders found.');
+    expect(emptyCell.textContent.trim()).toBe('No trades found.');
   });
 
-  it('should return the order id from trackById', () => {
-    expect(component.trackById(0, mockOrder)).toBe('1');
+  it('should return the trade id from trackById', () => {
+    expect(component.trackById(0, mockTrade)).toBe('1');
   });
 
-  it('should navigate to order detail when goToDetail is called', () => {
+  it('should navigate to trade detail when goToDetail is called', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate');
 
@@ -134,7 +134,7 @@ describe('OrdersList', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/trades', '42']);
   });
 
-  it('should navigate to new order form when goToCreate is called', () => {
+  it('should navigate to new trade form when goToCreate is called', () => {
     const router = TestBed.inject(Router);
     spyOn(router, 'navigate');
 

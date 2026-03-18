@@ -5,9 +5,9 @@ import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 
 import { routes } from './app.routes';
-import { ordersReducer } from './orders/store/orders.reducer';
-import { OrdersEffects } from './orders/store/orders.effects';
-import { ORDERS_FEATURE_KEY } from './orders/store/orders.selectors';
+import { tradesReducer } from './trades/store/trades.reducer';
+import { TradesEffects } from './trades/store/trades.effects';
+import { TRADES_FEATURE_KEY } from './trades/store/trades.selectors';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,7 +15,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(),
-    provideStore({ [ORDERS_FEATURE_KEY]: ordersReducer }),
-    provideEffects([OrdersEffects]),
+    provideStore({ [TRADES_FEATURE_KEY]: tradesReducer }),
+    provideEffects([TradesEffects]),
   ]
 };

@@ -1,15 +1,15 @@
 import { TradeOrder } from '../../core/models/trade-order.model';
 
-export interface OrdersState {
-  orders: TradeOrder[];
+export interface TradesState {
+  trades: TradeOrder[];
   loading: boolean;
   error: string | null;
   creating: boolean;
   createError: string | null;
 }
 
-export const initialOrdersState: OrdersState = {
-  orders: [],
+export const initialTradesState: TradesState = {
+  trades: [],
   loading: false,
   error: null,
   creating: false,
