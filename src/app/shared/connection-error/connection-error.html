@@ -1,0 +1,16 @@
+<div class="connection-error" role="alert">
+  <div class="connection-error__icon" aria-hidden="true">
+    <i class="fa-solid fa-plug-circle-xmark"></i>
+  </div>
+  <h2 class="connection-error__title">Connection Error</h2>
+  <p class="connection-error__message">{{ message }}</p>
+  <button
+    class="btn btn--primary connection-error__btn"
+    type="button"
+    aria-label="Retry connection"
+    (click)="onRetry()"
+  >
+    <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+    Try Again
+  </button>
+</div>

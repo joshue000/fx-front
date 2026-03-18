@@ -67,9 +67,16 @@ describe('Trades Selectors', () => {
   });
 
   describe('selectTradesError', () => {
-    it('should return the error message when an error exists', () => {
-      const state = buildState({ error: 'Something went wrong' });
-      expect(selectTradesError(state)).toBe('Something went wrong');
+    it('should return the AppError when an API error exists', () => {
+      const error = { kind: 'api' as const, message: 'Something went wrong' };
+      const state = buildState({ error });
+      expect(selectTradesError(state)).toEqual(error);
+    });
+
+    it('should return the AppError when a network error exists', () => {
+      const error = { kind: 'network' as const, message: 'Unable to reach the server.' };
+      const state = buildState({ error });
+      expect(selectTradesError(state)).toEqual(error);
     });
 
     it('should return null when there is no error', () => {

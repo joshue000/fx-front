@@ -8,17 +8,11 @@
     </h1>
   </header>
 
-  @if (mode !== 'create' && (loadingOne$ | async)) {
+  @if (isNetworkLoadError$ | async) {
+    <app-connection-error (retry)="onRetry()" />
+  } @else if (mode !== 'create' && (loadingOne$ | async)) {
     <div class="trade-form__loading">Loading trade...</div>
   } @else {
-    @if (submitError$ | async; as error) {
-      <div class="trade-form__error">{{ error }}</div>
-    }
-
-    @if (mode !== 'create' && (loadOneError$ | async); as loadError) {
-      <div class="trade-form__error">{{ loadError }}</div>
-    }
-
     <form class="trade-form" [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="trade-form__group">
         <label class="trade-form__label" for="pair">Currency Pair</label>
@@ -103,7 +97,7 @@
           <input
             id="price"
             class="trade-form__input"
-            [class.trade-form__input--invalid]="isInvalid('price')"
+            [class.trade-form__input--invalid]="isInvalid('price') || showPriceCrossFieldError"
             type="number"
             formControlName="price"
             placeholder="0.00"
@@ -111,7 +105,9 @@
             step="0.0001"
             aria-label="Trade price"
           />
-          @if (isInvalid('price')) {
+          @if (isMarketOrder) {
+            <span class="trade-form__info">Auto-filled with current market price.</span>
+          } @else if (isInvalid('price') || showPriceCrossFieldError) {
             <span class="trade-form__hint">{{ getPriceError() }}</span>
           }
         </div>
@@ -142,7 +138,7 @@
           <button
             type="submit"
             class="btn btn--primary"
-            [disabled]="submitting$ | async"
+            [disabled]="(submitting$ | async) || form.invalid"
             aria-label="Submit trade form"
           >
             @if (submitting$ | async) {
@@ -158,3 +154,17 @@
     </form>
   }
 </section>
+
+@if (apiLoadError$ | async; as error) {
+  <app-error-modal
+    [message]="error.message"
+    (dismissed)="onLoadErrorDismissed()"
+  />
+}
+
+@if (submitError$ | async; as error) {
+  <app-error-modal
+    [message]="error.message"
+    (dismissed)="onSubmitErrorDismissed()"
+  />
+}

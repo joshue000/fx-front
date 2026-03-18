@@ -6,10 +6,11 @@ import { provideMockActions } from '@ngrx/effects/testing';
 import { ReplaySubject } from 'rxjs';
 
 import { TradesList, DEFAULT_PAGE_SIZE } from './trades-list';
-import { deleteTrade, deleteTradeSuccess, loadTrades } from '../store/trades.actions';
-import { selectTrades, selectTradesError, selectTradesLoading, selectTradesPagination } from '../store/trades.selectors';
+import { clearTradesErrors, deleteTrade, deleteTradeSuccess, loadTrades } from '../store/trades.actions';
+import { selectTrades, selectTradesDeleteError, selectTradesError, selectTradesLoading, selectTradesPagination } from '../store/trades.selectors';
 import { TradesState } from '../store/trades.state';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
+import { AppError } from '../../core/models/app-error.model';
 import { TRADES_FEATURE_KEY } from '../store/trades.selectors';
 import { PaginationMetadata } from '../../core/models/paginated-response.model';
 
@@ -57,7 +58,8 @@ describe('TradesList', () => {
   let actions$: ReplaySubject<Action>;
   let mockSelectTrades: MemoizedSelector<object, TradeOrder[]>;
   let mockSelectLoading: MemoizedSelector<object, boolean>;
-  let mockSelectError: MemoizedSelector<object, string | null>;
+  let mockSelectError: MemoizedSelector<object, AppError | null>;
+  let mockSelectDeleteError: MemoizedSelector<object, AppError | null>;
   let mockSelectPagination: MemoizedSelector<object, PaginationMetadata | null>;
 
   beforeEach(async () => {
@@ -76,6 +78,7 @@ describe('TradesList', () => {
     mockSelectTrades = store.overrideSelector(selectTrades, []);
     mockSelectLoading = store.overrideSelector(selectTradesLoading, false);
     mockSelectError = store.overrideSelector(selectTradesError, null);
+    mockSelectDeleteError = store.overrideSelector(selectTradesDeleteError, null);
     mockSelectPagination = store.overrideSelector(selectTradesPagination, null);
 
     fixture = TestBed.createComponent(TradesList);
@@ -122,15 +125,30 @@ describe('TradesList', () => {
     expect(loading.textContent.trim()).toBe('Loading trades...');
   });
 
-  it('should display the error message when an error exists', async () => {
-    mockSelectError.setResult('Failed to load trades');
+  it('should show an ErrorModal when an API error exists', async () => {
+    mockSelectError.setResult({ kind: 'api', message: 'Failed to load trades' });
     store.refreshState();
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const error = fixture.nativeElement.querySelector('.trades-error');
-    expect(error).not.toBeNull();
-    expect(error.textContent.trim()).toBe('Failed to load trades');
+    const modal = fixture.nativeElement.querySelector('app-error-modal');
+    expect(modal).not.toBeNull();
+  });
+
+  it('should show ConnectionError when a network error exists', async () => {
+    mockSelectError.setResult({ kind: 'network', message: 'Unable to reach the server.' });
+    store.refreshState();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const connError = fixture.nativeElement.querySelector('app-connection-error');
+    expect(connError).not.toBeNull();
+  });
+
+  it('should dispatch clearTradesErrors when delete error is dismissed', () => {
+    const dispatchSpy = spyOn(store, 'dispatch');
+    component.onDeleteErrorDismissed();
+    expect(dispatchSpy).toHaveBeenCalledWith(clearTradesErrors());
   });
 
   it('should display the empty state when trades list is empty', async () => {

@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 
 import { TradeOrder } from '../../core/models/trade-order.model';
+import { AppError } from '../../core/models/app-error.model';
 import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
 import { UpdateTradeDto } from '../../core/dtos/update-trade.dto';
 import { PaginationMetadata } from '../../core/models/paginated-response.model';
@@ -17,7 +18,7 @@ export const loadTradesSuccess = createAction(
 
 export const loadTradesFailure = createAction(
   '[Trades] Load Trades Failure',
-  props<{ error: string }>()
+  props<{ error: AppError }>()
 );
 
 export const loadTrade = createAction(
@@ -32,7 +33,7 @@ export const loadTradeSuccess = createAction(
 
 export const loadTradeFailure = createAction(
   '[Trades] Load Trade Failure',
-  props<{ error: string }>()
+  props<{ error: AppError }>()
 );
 
 export const createTrade = createAction(
@@ -47,7 +48,7 @@ export const createTradeSuccess = createAction(
 
 export const createTradeFailure = createAction(
   '[Trades] Create Trade Failure',
-  props<{ error: string }>()
+  props<{ error: AppError }>()
 );
 
 export const updateTrade = createAction(
@@ -62,7 +63,7 @@ export const updateTradeSuccess = createAction(
 
 export const updateTradeFailure = createAction(
   '[Trades] Update Trade Failure',
-  props<{ error: string }>()
+  props<{ error: AppError }>()
 );
 
 export const deleteTrade = createAction(
@@ -77,5 +78,7 @@ export const deleteTradeSuccess = createAction(
 
 export const deleteTradeFailure = createAction(
   '[Trades] Delete Trade Failure',
-  props<{ error: string }>()
+  props<{ error: AppError }>()
 );
+
+export const clearTradesErrors = createAction('[Trades] Clear Errors');

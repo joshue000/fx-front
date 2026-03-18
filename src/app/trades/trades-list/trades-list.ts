@@ -4,13 +4,21 @@ import { Router } from '@angular/router';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { TradeOrder } from '../../core/models/trade-order.model';
+import { AppError } from '../../core/models/app-error.model';
 import { PaginationMetadata } from '../../core/models/paginated-response.model';
-import { deleteTrade, deleteTradeSuccess, loadTrades } from '../store/trades.actions';
+import {
+  clearTradesErrors,
+  deleteTrade,
+  deleteTradeSuccess,
+  loadTrades,
+} from '../store/trades.actions';
 import {
   selectTrades,
+  selectTradesDeleteError,
   selectTradesError,
   selectTradesLoading,
   selectTradesPagination,
@@ -18,12 +26,14 @@ import {
 import { Pagination } from '../../shared/pagination/pagination';
 import { PageSizeSelector } from '../../shared/page-size-selector/page-size-selector';
 import { ConfirmModal } from '../../shared/confirm-modal/confirm-modal';
+import { ErrorModal } from '../../shared/error-modal/error-modal';
+import { ConnectionError } from '../../shared/connection-error/connection-error';
 
 export const DEFAULT_PAGE_SIZE = 5;
 
 @Component({
   selector: 'app-trades-list',
-  imports: [AsyncPipe, UpperCasePipe, Pagination, PageSizeSelector, ConfirmModal],
+  imports: [AsyncPipe, UpperCasePipe, Pagination, PageSizeSelector, ConfirmModal, ErrorModal, ConnectionError],
   templateUrl: './trades-list.html',
   styleUrl: './trades-list.scss'
 })
@@ -34,8 +44,14 @@ export class TradesList implements OnInit {
 
   readonly trades$: Observable<TradeOrder[]> = this.store.select(selectTrades);
   readonly loading$: Observable<boolean> = this.store.select(selectTradesLoading);
-  readonly error$: Observable<string | null> = this.store.select(selectTradesError);
   readonly pagination$: Observable<PaginationMetadata | null> = this.store.select(selectTradesPagination);
+
+  private readonly loadError$ = this.store.select(selectTradesError);
+  readonly isNetworkError$: Observable<boolean> = this.loadError$.pipe(map(e => e?.kind === 'network'));
+  readonly apiLoadError$: Observable<AppError | null> = this.loadError$.pipe(
+    map(e => e?.kind === 'api' ? e : null)
+  );
+  readonly deleteError$: Observable<AppError | null> = this.store.select(selectTradesDeleteError);
 
   currentPageSize = DEFAULT_PAGE_SIZE;
   showDeleteModal = false;
@@ -66,6 +82,18 @@ export class TradesList implements OnInit {
   onPageSizeChange(limit: number): void {
     this.currentPageSize = limit;
     this.store.dispatch(loadTrades({ page: 1, limit }));
+  }
+
+  onRetry(): void {
+    this.store.dispatch(loadTrades({ page: 1, limit: this.currentPageSize }));
+  }
+
+  onLoadErrorDismissed(): void {
+    this.store.dispatch(loadTrades({ page: 1, limit: this.currentPageSize }));
+  }
+
+  onDeleteErrorDismissed(): void {
+    this.store.dispatch(clearTradesErrors());
   }
 
   goToDetail(id: string): void {

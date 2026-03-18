@@ -4,98 +4,112 @@
     <button class="btn btn--primary" (click)="goToCreate()">+ New Trade</button>
   </header>
 
-  @if (error$ | async; as error) {
-    <div class="trades-error">{{ error }}</div>
-  }
-
-  @if (loading$ | async) {
-    <div class="trades-loading">Loading trades...</div>
-  } @else if (trades$ | async; as trades) {
-    <div class="trades-table-wrapper">
-      <table class="trades-table">
-        <thead>
-          <tr>
-            <th>Pair</th>
-            <th>Side</th>
-            <th>Type</th>
-            <th>Amount</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (trade of trades; track trackById($index, trade)) {
-            <tr class="trades-table__row">
-              <td class="trades-table__pair">{{ trade.pair }}</td>
-              <td>
-                <span class="badge badge--side badge--{{ trade.side }}">
-                  {{ trade.side | uppercase }}
-                </span>
-              </td>
-              <td class="trades-table__type">{{ trade.type | uppercase }}</td>
-              <td class="trades-table__amount">{{ trade.amount }}</td>
-              <td class="trades-table__price">${{ trade.price }}</td>
-              <td>
-                <span class="badge badge--status badge--{{ trade.status }}">
-                  {{ trade.status | uppercase }}
-                </span>
-              </td>
-              <td class="trades-table__actions">
-                <button
-                  class="btn-icon btn-icon--view"
-                  title="View details"
-                  aria-label="View details"
-                  (click)="goToDetail(trade.id)"
-                >
-                  <i class="fa-solid fa-eye" aria-hidden="true"></i>
-                </button>
-                <button
-                  class="btn-icon btn-icon--edit"
-                  title="Edit order"
-                  aria-label="Edit order"
-                  (click)="goToEdit(trade.id)"
-                >
-                  <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
-                </button>
-                <button
-                  class="btn-icon btn-icon--delete"
-                  title="Delete order"
-                  aria-label="Delete order"
-                  (click)="onDelete(trade.id)"
-                >
-                  <i class="fa-solid fa-trash" aria-hidden="true"></i>
-                </button>
-              </td>
-            </tr>
-          } @empty {
+  @if (isNetworkError$ | async) {
+    <app-connection-error (retry)="onRetry()" />
+  } @else {
+    @if (loading$ | async) {
+      <div class="trades-loading">Loading trades...</div>
+    } @else if (trades$ | async; as trades) {
+      <div class="trades-table-wrapper">
+        <table class="trades-table">
+          <thead>
             <tr>
-              <td colspan="7" class="trades-table__empty">No trades found.</td>
+              <th>Pair</th>
+              <th>Side</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <footer class="trades-table-footer">
-      <div class="trades-table-footer__pagination">
-        @if (pagination$ | async; as pagination) {
-          @if (pagination.totalPages > 1) {
-            <app-pagination
-              [currentPage]="pagination.page"
-              [totalPages]="pagination.totalPages"
-              (pageChange)="onPageChange($event)"
-            />
-          }
-        }
+          </thead>
+          <tbody>
+            @for (trade of trades; track trackById($index, trade)) {
+              <tr class="trades-table__row">
+                <td class="trades-table__pair">{{ trade.pair }}</td>
+                <td>
+                  <span class="badge badge--side badge--{{ trade.side }}">
+                    {{ trade.side | uppercase }}
+                  </span>
+                </td>
+                <td class="trades-table__type">{{ trade.type | uppercase }}</td>
+                <td class="trades-table__amount">{{ trade.amount }}</td>
+                <td class="trades-table__price">${{ trade.price }}</td>
+                <td>
+                  <span class="badge badge--status badge--{{ trade.status }}">
+                    {{ trade.status | uppercase }}
+                  </span>
+                </td>
+                <td class="trades-table__actions">
+                  <button
+                    class="btn-icon btn-icon--view"
+                    title="View details"
+                    aria-label="View details"
+                    (click)="goToDetail(trade.id)"
+                  >
+                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    class="btn-icon btn-icon--edit"
+                    title="Edit order"
+                    aria-label="Edit order"
+                    (click)="goToEdit(trade.id)"
+                  >
+                    <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                  </button>
+                  <button
+                    class="btn-icon btn-icon--delete"
+                    title="Delete order"
+                    aria-label="Delete order"
+                    (click)="onDelete(trade.id)"
+                  >
+                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                  </button>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="trades-table__empty">No trades found.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
       </div>
-      <app-page-size-selector
-        [pageSize]="currentPageSize"
-        (pageSizeChange)="onPageSizeChange($event)"
-      />
-    </footer>
+
+      <footer class="trades-table-footer">
+        <div class="trades-table-footer__pagination">
+          @if (pagination$ | async; as pagination) {
+            @if (pagination.totalPages > 1) {
+              <app-pagination
+                [currentPage]="pagination.page"
+                [totalPages]="pagination.totalPages"
+                (pageChange)="onPageChange($event)"
+              />
+            }
+          }
+        </div>
+        <app-page-size-selector
+          [pageSize]="currentPageSize"
+          (pageSizeChange)="onPageSizeChange($event)"
+        />
+      </footer>
+    }
   }
 </section>
+
+@if (apiLoadError$ | async; as error) {
+  <app-error-modal
+    [message]="error.message"
+    (dismissed)="onLoadErrorDismissed()"
+  />
+}
+
+@if (deleteError$ | async; as error) {
+  <app-error-modal
+    [message]="error.message"
+    (dismissed)="onDeleteErrorDismissed()"
+  />
+}
 
 @if (showDeleteModal) {
   <app-confirm-modal

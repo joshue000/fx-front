@@ -2,6 +2,7 @@ import { createReducer, on } from '@ngrx/store';
 
 import { initialTradesState, TradesState } from './trades.state';
 import {
+  clearTradesErrors,
   createTrade,
   createTradeFailure,
   createTradeSuccess,
@@ -98,5 +99,13 @@ export const tradesReducer = createReducer<TradesState>(
     ...state,
     deleting: false,
     deleteError: error,
+  })),
+  on(clearTradesErrors, (state): TradesState => ({
+    ...state,
+    error: null,
+    createError: null,
+    loadOneError: null,
+    updateError: null,
+    deleteError: null,
   }))
 );

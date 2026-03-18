@@ -60,8 +60,10 @@ export function validPairValidator(control: AbstractControl): ValidationErrors |
 
 /**
  * Group-level validator that sets cross-field price errors directly on the
- * price control. Errors are only applied once the price control is both
- * touched and dirty, to avoid showing errors on untouched fields.
+ * price control. Errors are applied whenever price has a value, making
+ * validation reactive — errors reflect the current form state immediately.
+ * Display-side gating (whether to show the error in the UI) is handled
+ * by the component's showPriceCrossFieldError getter.
  */
 export const orderPriceGroupValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
   const pair = group.get('pair')?.value as string | null;
@@ -70,9 +72,6 @@ export const orderPriceGroupValidator: ValidatorFn = (group: AbstractControl): V
   const priceControl = group.get('price');
 
   if (!priceControl) return null;
-
-  // Only apply cross-field errors when the user has interacted with the price field
-  if (!priceControl.touched || !priceControl.dirty) return null;
 
   const crossFieldError = validateOrderPrice(pair, side, type, priceControl.value as number | null);
 

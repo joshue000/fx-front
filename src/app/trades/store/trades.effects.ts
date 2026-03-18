@@ -1,7 +1,9 @@
 import { inject, Injectable } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, map, of, switchMap } from 'rxjs';
 
+import { AppError } from '../../core/models/app-error.model';
 import { TradesService } from '../services/trades.service';
 import {
   createTrade,
@@ -21,6 +23,14 @@ import {
   updateTradeSuccess,
 } from './trades.actions';
 
+function toAppError(err: HttpErrorResponse): AppError {
+  if (err.status === 0) {
+    return { kind: 'network', message: 'Unable to reach the server. Please check your connection.' };
+  }
+  const message: string = err.error?.message ?? err.error?.error ?? `Server error (${err.status})`;
+  return { kind: 'api', message };
+}
+
 @Injectable()
 export class TradesEffects {
   private readonly actions$ = inject(Actions);
@@ -32,7 +42,7 @@ export class TradesEffects {
       switchMap(({ page, limit }) =>
         this.tradesService.getTrades(page, limit).pipe(
           map(response => loadTradesSuccess({ trades: response.data, pagination: response.metadata })),
-          catchError(error => of(loadTradesFailure({ error: error.message })))
+          catchError((err: HttpErrorResponse) => of(loadTradesFailure({ error: toAppError(err) })))
         )
       )
     )
@@ -44,7 +54,7 @@ export class TradesEffects {
       switchMap(({ id }) =>
         this.tradesService.getTradeById(id).pipe(
           map(trade => loadTradeSuccess({ trade })),
-          catchError(error => of(loadTradeFailure({ error: error.message })))
+          catchError((err: HttpErrorResponse) => of(loadTradeFailure({ error: toAppError(err) })))
         )
       )
     )
@@ -56,7 +66,7 @@ export class TradesEffects {
       switchMap(({ dto }) =>
         this.tradesService.createTrade(dto).pipe(
           map(trade => createTradeSuccess({ trade })),
-          catchError(error => of(createTradeFailure({ error: error.message })))
+          catchError((err: HttpErrorResponse) => of(createTradeFailure({ error: toAppError(err) })))
         )
       )
     )
@@ -68,7 +78,7 @@ export class TradesEffects {
       switchMap(({ id, dto }) =>
         this.tradesService.updateTrade(id, dto).pipe(
           map(trade => updateTradeSuccess({ trade })),
-          catchError(error => of(updateTradeFailure({ error: error.message })))
+          catchError((err: HttpErrorResponse) => of(updateTradeFailure({ error: toAppError(err) })))
         )
       )
     )
@@ -80,7 +90,7 @@ export class TradesEffects {
       switchMap(({ id }) =>
         this.tradesService.deleteTrade(id).pipe(
           map(() => deleteTradeSuccess({ id })),
-          catchError(error => of(deleteTradeFailure({ error: error.message })))
+          catchError((err: HttpErrorResponse) => of(deleteTradeFailure({ error: toAppError(err) })))
         )
       )
     )

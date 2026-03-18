@@ -16,6 +16,7 @@ import {
 import { TradesState } from '../store/trades.state';
 import { TRADES_FEATURE_KEY } from '../store/trades.selectors';
 import { OrderSide, OrderStatus, OrderType } from '../../core/models/trade-order.model';
+import { AppError } from '../../core/models/app-error.model';
 import { MARKET_PRICES } from '../../core/constants/market-prices.constant';
 
 const initialState: { [TRADES_FEATURE_KEY]: TradesState } = {
@@ -42,7 +43,7 @@ describe('TradeForm', () => {
   let store: MockStore;
   let actions$: ReplaySubject<Action>;
   let mockSelectCreating: MemoizedSelector<object, boolean>;
-  let mockSelectCreateError: MemoizedSelector<object, string | null>;
+  let mockSelectCreateError: MemoizedSelector<object, AppError | null>;
 
   beforeEach(async () => {
     actions$ = new ReplaySubject<Action>(1);
@@ -79,14 +80,14 @@ describe('TradeForm', () => {
     expect(component.mode).toBe('create');
   });
 
-  it('should initialize the form with empty values', () => {
+  it('should initialize the form with empty values except status which defaults to open', () => {
     expect(component.form.value).toEqual({
       pair: '',
       side: '',
       type: '',
       amount: null,
       price: null,
-      status: '',
+      status: OrderStatus.open,
     });
   });
 
@@ -168,7 +169,7 @@ describe('TradeForm', () => {
       component.form.updateValueAndValidity();
     }
 
-    it('should not show a price error before the price field is touched and dirty', () => {
+    it('should not show a cross-field price error in the UI before any related field is touched', () => {
       component.form.patchValue({
         pair: 'EURUSD',
         side: OrderSide.buy,
@@ -176,7 +177,21 @@ describe('TradeForm', () => {
         price: 9999,
       });
 
-      expect(component.form.get('price')?.hasError('limitBuyTooHigh')).toBeFalse();
+      // The error is computed on the control immediately, but the UI must not
+      // display it until the user has interacted with at least one related field.
+      expect(component.showPriceCrossFieldError).toBeFalse();
+    });
+
+    it('should show a cross-field price error after a related field is touched', () => {
+      component.form.patchValue({
+        pair: 'EURUSD',
+        side: OrderSide.buy,
+        type: OrderType.limit,
+        price: 9999,
+      });
+      component.form.get('type')!.markAsTouched();
+
+      expect(component.showPriceCrossFieldError).toBeTrue();
     });
 
     it('should set limitBuyTooHigh when limit buy price is above market price', () => {
@@ -374,15 +389,14 @@ describe('TradeForm', () => {
   });
 
   describe('template', () => {
-    it('should display the error message when submitError$ emits', async () => {
-      mockSelectCreateError.setResult('Server error');
+    it('should show an ErrorModal when submitError$ emits', async () => {
+      mockSelectCreateError.setResult({ kind: 'api', message: 'Server error' });
       store.refreshState();
       fixture.detectChanges();
       await fixture.whenStable();
 
-      const errorEl = fixture.nativeElement.querySelector('.trade-form__error');
-      expect(errorEl).not.toBeNull();
-      expect(errorEl.textContent.trim()).toBe('Server error');
+      const modal = fixture.nativeElement.querySelector('app-error-modal');
+      expect(modal).not.toBeNull();
     });
 
     it('should disable the submit button when submitting$ is true', async () => {
@@ -393,6 +407,30 @@ describe('TradeForm', () => {
 
       const submitBtn = fixture.nativeElement.querySelector('button[type="submit"]');
       expect(submitBtn.disabled).toBeTrue();
+    });
+
+    it('should disable the submit button when the form is invalid', () => {
+      // Form is invalid by default (required fields empty)
+      fixture.detectChanges();
+
+      const submitBtn = fixture.nativeElement.querySelector('button[type="submit"]');
+      expect(submitBtn.disabled).toBeTrue();
+    });
+
+    it('should enable the submit button when the form is valid', async () => {
+      component.form.setValue({
+        pair: 'EURUSD',
+        side: OrderSide.buy,
+        type: OrderType.limit,
+        amount: 10000,
+        price: 1.0,
+        status: OrderStatus.open,
+      });
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const submitBtn = fixture.nativeElement.querySelector('button[type="submit"]');
+      expect(submitBtn.disabled).toBeFalse();
     });
 
     it('should show the submit button in create mode', () => {

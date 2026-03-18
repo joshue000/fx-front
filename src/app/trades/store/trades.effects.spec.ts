@@ -19,7 +19,7 @@ import { PaginatedResponse, PaginationMetadata } from '../../core/models/paginat
 
 const mockTrade: TradeOrder = {
   id: '1',
-  pair: 'EUR/USD',
+  pair: 'EURUSD',
   side: OrderSide.buy,
   type: OrderType.limit,
   amount: '10000',
@@ -73,14 +73,30 @@ describe('TradesEffects', () => {
       actions$.next(loadTrades({ page: 1, limit: 10 }));
     });
 
-    it('should dispatch loadTradesFailure when the service throws an error', (done) => {
-      const errorMessage = 'Http failure response';
+    it('should dispatch loadTradesFailure with a network AppError when status is 0', (done) => {
       tradesServiceSpy.getTrades.and.returnValue(
-        throwError(() => new Error(errorMessage))
+        throwError(() => ({ status: 0, error: null }))
       );
 
       effects.loadTrades$.subscribe((action) => {
-        expect(action).toEqual(loadTradesFailure({ error: errorMessage }));
+        expect(action).toEqual(loadTradesFailure({
+          error: { kind: 'network', message: 'Unable to reach the server. Please check your connection.' },
+        }));
+        done();
+      });
+
+      actions$.next(loadTrades({ page: 1, limit: 10 }));
+    });
+
+    it('should dispatch loadTradesFailure with an api AppError when the server responds with an error', (done) => {
+      tradesServiceSpy.getTrades.and.returnValue(
+        throwError(() => ({ status: 500, error: { message: 'Internal server error' } }))
+      );
+
+      effects.loadTrades$.subscribe((action) => {
+        expect(action).toEqual(loadTradesFailure({
+          error: { kind: 'api', message: 'Internal server error' },
+        }));
         done();
       });
 
@@ -101,11 +117,11 @@ describe('TradesEffects', () => {
 
   describe('createTrade$', () => {
     const mockDto: CreateTradeDto = {
-      pair: 'EUR/USD',
+      pair: 'EURUSD',
       side: OrderSide.buy,
       type: OrderType.limit,
       amount: 10000,
-      price: 1.085,
+      price: 1.0,
     };
 
     it('should dispatch createTradeSuccess when the service returns the created trade', (done) => {
@@ -119,14 +135,15 @@ describe('TradesEffects', () => {
       actions$.next(createTrade({ dto: mockDto }));
     });
 
-    it('should dispatch createTradeFailure when the service throws an error', (done) => {
-      const errorMessage = 'Validation failed';
+    it('should dispatch createTradeFailure with an api AppError when the server rejects the request', (done) => {
       tradesServiceSpy.createTrade.and.returnValue(
-        throwError(() => new Error(errorMessage))
+        throwError(() => ({ status: 400, error: { message: 'Validation failed' } }))
       );
 
       effects.createTrade$.subscribe((action) => {
-        expect(action).toEqual(createTradeFailure({ error: errorMessage }));
+        expect(action).toEqual(createTradeFailure({
+          error: { kind: 'api', message: 'Validation failed' },
+        }));
         done();
       });
 

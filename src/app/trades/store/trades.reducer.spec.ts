@@ -1,6 +1,7 @@
 import { tradesReducer } from './trades.reducer';
 import { initialTradesState, TradesState } from './trades.state';
 import {
+  clearTradesErrors,
   createTrade,
   createTradeFailure,
   createTradeSuccess,
@@ -8,13 +9,14 @@ import {
   loadTradesFailure,
   loadTradesSuccess,
 } from './trades.actions';
+import { AppError } from '../../core/models/app-error.model';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
 import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
 import { PaginationMetadata } from '../../core/models/paginated-response.model';
 
 const mockTrade: TradeOrder = {
   id: '1',
-  pair: 'EUR/USD',
+  pair: 'EURUSD',
   side: OrderSide.buy,
   type: OrderType.limit,
   amount: '10000',
@@ -31,6 +33,9 @@ const mockPagination: PaginationMetadata = {
   totalPages: 3,
 };
 
+const networkError: AppError = { kind: 'network', message: 'Unable to reach the server.' };
+const apiError: AppError = { kind: 'api', message: 'Bad Request' };
+
 describe('tradesReducer', () => {
   it('should return the initial state when an unknown action is dispatched', () => {
     const action = { type: '[Unknown] Action' } as any;
@@ -42,7 +47,7 @@ describe('tradesReducer', () => {
     it('should set loading to true and clear any previous error', () => {
       const previousState: TradesState = {
         ...initialTradesState,
-        error: 'previous error',
+        error: networkError,
         loading: false,
       };
 
@@ -79,7 +84,7 @@ describe('tradesReducer', () => {
     });
 
     it('should replace existing trades with the new payload', () => {
-      const anotherTrade: TradeOrder = { ...mockTrade, id: '2', pair: 'GBP/USD' };
+      const anotherTrade: TradeOrder = { ...mockTrade, id: '2', pair: 'BTCUSD' };
       const previousState: TradesState = {
         ...initialTradesState,
         trades: [mockTrade],
@@ -96,15 +101,15 @@ describe('tradesReducer', () => {
   });
 
   describe('loadTradesFailure', () => {
-    it('should set the error message and set loading to false', () => {
+    it('should set the AppError and set loading to false', () => {
       const loadingState: TradesState = { ...initialTradesState, loading: true };
 
       const state = tradesReducer(
         loadingState,
-        loadTradesFailure({ error: 'Network error' })
+        loadTradesFailure({ error: networkError })
       );
 
-      expect(state.error).toBe('Network error');
+      expect(state.error).toEqual(networkError);
       expect(state.loading).toBeFalse();
     });
 
@@ -115,7 +120,7 @@ describe('tradesReducer', () => {
         loading: true,
       };
 
-      const state = tradesReducer(loadingState, loadTradesFailure({ error: 'Timeout' }));
+      const state = tradesReducer(loadingState, loadTradesFailure({ error: apiError }));
 
       expect(state.trades).toEqual([mockTrade]);
     });
@@ -123,17 +128,17 @@ describe('tradesReducer', () => {
 
   describe('createTrade', () => {
     const mockDto: CreateTradeDto = {
-      pair: 'EUR/USD',
+      pair: 'EURUSD',
       side: OrderSide.buy,
       type: OrderType.limit,
       amount: 10000,
-      price: 1.085,
+      price: 1.0,
     };
 
     it('should set creating to true and clear any previous createError', () => {
       const previousState: TradesState = {
         ...initialTradesState,
-        createError: 'previous error',
+        createError: apiError,
       };
 
       const state = tradesReducer(previousState, createTrade({ dto: mockDto }));
@@ -150,7 +155,7 @@ describe('tradesReducer', () => {
         trades: [mockTrade],
         creating: true,
       };
-      const newTrade: TradeOrder = { ...mockTrade, id: '2', pair: 'GBP/USD' };
+      const newTrade: TradeOrder = { ...mockTrade, id: '2', pair: 'BTCUSD' };
 
       const state = tradesReducer(creatingState, createTradeSuccess({ trade: newTrade }));
 
@@ -166,9 +171,9 @@ describe('tradesReducer', () => {
         creating: true,
       };
 
-      const state = tradesReducer(creatingState, createTradeFailure({ error: 'Bad Request' }));
+      const state = tradesReducer(creatingState, createTradeFailure({ error: apiError }));
 
-      expect(state.createError).toBe('Bad Request');
+      expect(state.createError).toEqual(apiError);
       expect(state.creating).toBeFalse();
     });
 
@@ -179,9 +184,30 @@ describe('tradesReducer', () => {
         creating: true,
       };
 
-      const state = tradesReducer(creatingState, createTradeFailure({ error: 'Server Error' }));
+      const state = tradesReducer(creatingState, createTradeFailure({ error: networkError }));
 
       expect(state.trades).toEqual([mockTrade]);
+    });
+  });
+
+  describe('clearTradesErrors', () => {
+    it('should clear all error fields', () => {
+      const errorState: TradesState = {
+        ...initialTradesState,
+        error: networkError,
+        createError: apiError,
+        loadOneError: apiError,
+        updateError: networkError,
+        deleteError: apiError,
+      };
+
+      const state = tradesReducer(errorState, clearTradesErrors());
+
+      expect(state.error).toBeNull();
+      expect(state.createError).toBeNull();
+      expect(state.loadOneError).toBeNull();
+      expect(state.updateError).toBeNull();
+      expect(state.deleteError).toBeNull();
     });
   });
 });

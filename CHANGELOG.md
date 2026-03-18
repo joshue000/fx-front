@@ -6,6 +6,45 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.17] - 2026-03-17
+
+### Changed
+- `TradeForm`: submit button is now also disabled when `form.invalid` (previously only disabled while submitting)
+- `TradeForm`: `status` field defaults to `open` instead of empty string
+- `trade-form.spec.ts`: updated form initialization test to expect `status: OrderStatus.open`; added tests for submit button disabled when form invalid and enabled when form valid
+
+---
+
+## [0.0.16] - 2026-03-17
+
+### Changed
+- `orderPriceGroupValidator`: removed `touched && dirty` guard — cross-field price errors are now computed immediately whenever price has a value, making validation fully reactive
+- `TradeForm`: added `showPriceCrossFieldError` getter — controls UI display of cross-field errors; shows the error only after the user has interacted with at least one related field (pair, side, type, or price), preventing premature error display on initial load or edit mode population
+- `trade-form.html`: price input invalid class now also binds to `showPriceCrossFieldError`; restored market order info message (`trade-form__info`) shown instead of error hint when type is market
+- `trade-form.scss`: added `.trade-form__info` style (indigo, 0.8rem) for the market price auto-fill message
+- `trade-form.spec.ts`: updated cross-field display test to assert `showPriceCrossFieldError` (UI gating) instead of raw `hasError` (which is now always set when price has a value); added test confirming the error becomes visible after a related field is touched; removed unused `clearTradesErrors` import
+
+---
+
+## [0.0.15] - 2026-03-17
+
+### Added
+- `AppError` model at `core/models/app-error.model.ts` — `{ kind: 'network' | 'api'; message: string }` — typed error contract used across the entire store
+- `ErrorModal` shared component at `shared/error-modal/` — fixed-position overlay showing an error icon, message, and a Close button; emits `dismissed`
+- `ConnectionError` shared component at `shared/connection-error/` — inline replacement for content area showing a disconnection icon, message, and a Try Again button; emits `retry`
+- `clearTradesErrors` NgRx action — clears all error fields (`error`, `createError`, `loadOneError`, `updateError`, `deleteError`) in a single dispatch
+- `toAppError(HttpErrorResponse)` helper in effects — maps `status === 0` to `kind: 'network'`, all other statuses to `kind: 'api'` with the response body message
+
+### Changed
+- All failure actions (`loadTradesFailure`, `loadTradeFailure`, `createTradeFailure`, `updateTradeFailure`, `deleteTradeFailure`) changed from `{ error: string }` to `{ error: AppError }`
+- `TradesState` error fields changed from `string | null` to `AppError | null`
+- Effects extract human-readable messages from `err.error?.message` for API errors instead of the raw Angular `HttpErrorResponse.message`
+- `TradesList`: network errors replace the table with `ConnectionError` (with retry); API load errors show `ErrorModal` (dismissal re-fetches list); delete errors show `ErrorModal` (dismissal dispatches `clearTradesErrors`)
+- `TradeForm`: network load errors replace the form with `ConnectionError` (with retry); API load errors and submit errors show `ErrorModal` (dismissal dispatches `clearTradesErrors`)
+- Spec files updated: mock selectors use `AppError | null`; error display assertions check for `app-error-modal` / `app-connection-error` instead of inline div classes
+
+---
+
 ## [0.0.14] - 2026-03-17
 
 ### Changed

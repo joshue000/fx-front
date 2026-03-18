@@ -5,14 +5,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { filter, take } from 'rxjs/operators';
+import { filter, map, take } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
+import { AppError } from '../../core/models/app-error.model';
 import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
 import { UpdateTradeDto } from '../../core/dtos/update-trade.dto';
 import { MARKET_PRICES, VALID_PAIRS } from '../../core/constants/market-prices.constant';
 import {
+  clearTradesErrors,
   createTrade,
   createTradeSuccess,
   loadTrade,
@@ -30,12 +32,14 @@ import {
 } from '../store/trades.selectors';
 import { orderPriceGroupValidator, validPairValidator } from './validators/order-price.validator';
 import { PRICE_CROSS_FIELD_ERROR_KEYS } from './validators/order-price.validator';
+import { ErrorModal } from '../../shared/error-modal/error-modal';
+import { ConnectionError } from '../../shared/connection-error/connection-error';
 
 export type TradeFormMode = 'create' | 'view' | 'edit';
 
 @Component({
   selector: 'app-trade-form',
-  imports: [ReactiveFormsModule, AsyncPipe, UpperCasePipe],
+  imports: [ReactiveFormsModule, AsyncPipe, UpperCasePipe, ErrorModal, ConnectionError],
   templateUrl: './trade-form.html',
   styleUrl: './trade-form.scss',
 })
@@ -50,15 +54,23 @@ export class TradeForm implements OnInit {
   readonly tradeId: string | null = this.route.snapshot.paramMap.get('id');
 
   readonly loadingOne$: Observable<boolean> = this.store.select(selectTradesLoadingOne);
-  readonly loadOneError$: Observable<string | null> = this.store.select(selectTradesLoadOneError);
+
+  private readonly loadOneError$ = this.store.select(selectTradesLoadOneError);
+  readonly isNetworkLoadError$: Observable<boolean> = this.loadOneError$.pipe(
+    map(e => e?.kind === 'network')
+  );
+  readonly apiLoadError$: Observable<AppError | null> = this.loadOneError$.pipe(
+    map(e => e?.kind === 'api' ? e : null)
+  );
+
+  private readonly rawSubmitError$: Observable<AppError | null> = this.mode === 'edit'
+    ? this.store.select(selectTradesUpdateError)
+    : this.store.select(selectTradesCreateError);
+  readonly submitError$: Observable<AppError | null> = this.rawSubmitError$;
 
   readonly submitting$: Observable<boolean> = this.mode === 'edit'
     ? this.store.select(selectTradesUpdating)
     : this.store.select(selectTradesCreating);
-
-  readonly submitError$: Observable<string | null> = this.mode === 'edit'
-    ? this.store.select(selectTradesUpdateError)
-    : this.store.select(selectTradesCreateError);
 
   readonly orderSides = Object.values(OrderSide);
   readonly orderTypes = Object.values(OrderType);
@@ -72,7 +84,7 @@ export class TradeForm implements OnInit {
       type: ['' as OrderType | '', [Validators.required]],
       amount: [null as number | null, [Validators.required, Validators.min(0.01)]],
       price: [null as number | null, [Validators.required, Validators.min(0.0001)]],
-      status: ['' as OrderStatus | ''],
+      status: [OrderStatus.open as OrderStatus | ''],
     },
     { validators: [orderPriceGroupValidator] },
   );
@@ -151,6 +163,20 @@ export class TradeForm implements OnInit {
     }
   }
 
+  onRetry(): void {
+    if (this.tradeId) {
+      this.store.dispatch(loadTrade({ id: this.tradeId }));
+    }
+  }
+
+  onSubmitErrorDismissed(): void {
+    this.store.dispatch(clearTradesErrors());
+  }
+
+  onLoadErrorDismissed(): void {
+    this.store.dispatch(clearTradesErrors());
+  }
+
   goBack(): void {
     this.router.navigate(['/trades']);
   }
@@ -192,6 +218,20 @@ export class TradeForm implements OnInit {
     return this.form.get('type')?.value === OrderType.market;
   }
 
+  /**
+   * True when a cross-field price error should be displayed in the UI.
+   * The error is always computed by the validator, but shown only after
+   * the user has interacted with at least one related field (pair, side,
+   * type, or price itself), preventing premature error display on load.
+   */
+  get showPriceCrossFieldError(): boolean {
+    const priceControl = this.form.get('price')!;
+    if (priceControl.value == null) return false;
+    const hasCrossFieldError = PRICE_CROSS_FIELD_ERROR_KEYS.some(key => priceControl.hasError(key));
+    if (!hasCrossFieldError) return false;
+    return ['pair', 'side', 'type'].some(f => this.form.get(f)?.touched) || priceControl.touched;
+  }
+
   private syncMarketPrice(): void {
     if (this.mode === 'view') return;
 
@@ -208,7 +248,6 @@ export class TradeForm implements OnInit {
 
       if (!priceControl.disabled) {
         priceControl.disable({ emitEvent: false });
-        // Clear any cross-field errors since market orders have no price rule
         const errors = { ...(priceControl.errors ?? {}) };
         PRICE_CROSS_FIELD_ERROR_KEYS.forEach(key => delete errors[key]);
         priceControl.setErrors(Object.keys(errors).length ? errors : null, { emitEvent: false });

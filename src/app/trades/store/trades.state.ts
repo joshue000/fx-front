@@ -1,20 +1,21 @@
 import { TradeOrder } from '../../core/models/trade-order.model';
+import { AppError } from '../../core/models/app-error.model';
 import { PaginationMetadata } from '../../core/models/paginated-response.model';
 
 export interface TradesState {
   trades: TradeOrder[];
   pagination: PaginationMetadata | null;
   loading: boolean;
-  error: string | null;
+  error: AppError | null;
   creating: boolean;
-  createError: string | null;
+  createError: AppError | null;
   selectedTrade: TradeOrder | null;
   loadingOne: boolean;
-  loadOneError: string | null;
+  loadOneError: AppError | null;
   updating: boolean;
-  updateError: string | null;
+  updateError: AppError | null;
   deleting: boolean;
-  deleteError: string | null;
+  deleteError: AppError | null;
 }
 
 export const initialTradesState: TradesState = {
