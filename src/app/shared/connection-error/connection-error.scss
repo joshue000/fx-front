@@ -9,19 +9,19 @@
 
   &__icon {
     font-size: 3.5rem;
-    color: #9ca3af;
+    color: var(--clr-text-4);
   }
 
   &__title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #1a1a2e;
+    color: var(--clr-text-1);
     margin: 0;
   }
 
   &__message {
     font-size: 0.9375rem;
-    color: #6b7280;
+    color: var(--clr-text-3);
     margin: 0;
     max-width: 360px;
     line-height: 1.6;

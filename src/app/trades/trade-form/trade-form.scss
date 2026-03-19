@@ -13,6 +13,7 @@
   &__title {
     font-size: 1.5rem;
     font-weight: 600;
+    color: var(--clr-text-1);
     margin: 0;
   }
 }
@@ -47,25 +48,26 @@
   &__label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--clr-text-2);
   }
 
   &__optional {
     font-weight: 400;
-    color: #9ca3af;
+    color: var(--clr-text-4);
     font-size: 0.8rem;
   }
 
   &__input,
   &__select {
     padding: 0.5rem 0.75rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--clr-border-input);
     border-radius: 6px;
     font-size: 0.875rem;
     font-family: inherit;
     outline: none;
     transition: border-color 0.15s;
-    background: #fff;
+    background: var(--clr-surface);
+    color: var(--clr-text-2);
     width: 100%;
     box-sizing: border-box;
 
@@ -126,11 +128,11 @@
 
   &--outline {
     background: transparent;
-    border: 1px solid #d1d5db;
-    color: #374151;
+    border: 1px solid var(--clr-border-input);
+    color: var(--clr-text-2);
 
     &:hover {
-      background: #f9fafb;
+      background: var(--clr-surface-hover);
     }
   }
 }

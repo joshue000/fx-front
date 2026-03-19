@@ -6,16 +6,16 @@
 
 .page-size-selector__label {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--clr-text-3);
   white-space: nowrap;
 }
 
 .page-size-selector__select {
   padding: 0.25rem 0.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--clr-border);
   border-radius: 6px;
-  background: #ffffff;
-  color: #374151;
+  background: var(--clr-surface);
+  color: var(--clr-text-2);
   font-size: 0.875rem;
   font-family: inherit;
   cursor: pointer;
@@ -23,6 +23,6 @@
   transition: border-color 0.15s ease;
 
   &:focus {
-    border-color: #2563eb;
+    border-color: var(--clr-primary);
   }
 }

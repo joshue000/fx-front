@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 
 import { Lang, TranslationService } from '../../core/i18n/translation.service';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-header',
@@ -11,6 +12,7 @@ import { TranslatePipe } from '../../core/i18n/translate.pipe';
 })
 export class Header {
   private readonly translationService = inject(TranslationService);
+  readonly themeService = inject(ThemeService);
 
   readonly currentLang = this.translationService.currentLang;
 
