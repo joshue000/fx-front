@@ -1,10 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, map, of, switchMap } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { catchError, map, of, switchMap, withLatestFrom } from 'rxjs';
 
 import { AppError } from '../../core/models/app-error.model';
 import { TradesService } from '../services/trades.service';
+import { DEFAULT_PAGE_SIZE } from '../constants/trades.constants';
 import {
   createTrade,
   createTradeFailure,
@@ -22,6 +24,7 @@ import {
   updateTradeFailure,
   updateTradeSuccess,
 } from './trades.actions';
+import { selectTradesPagination } from './trades.selectors';
 
 function toAppError(err: HttpErrorResponse): AppError {
   if (err.status === 0) {
@@ -35,6 +38,7 @@ function toAppError(err: HttpErrorResponse): AppError {
 export class TradesEffects {
   private readonly actions$ = inject(Actions);
   private readonly tradesService = inject(TradesService);
+  private readonly store = inject(Store);
 
   loadTrades$ = createEffect(() =>
     this.actions$.pipe(
@@ -93,6 +97,14 @@ export class TradesEffects {
           catchError((err: HttpErrorResponse) => of(deleteTradeFailure({ error: toAppError(err) })))
         )
       )
+    )
+  );
+
+  reloadAfterDelete$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(deleteTradeSuccess),
+      withLatestFrom(this.store.select(selectTradesPagination)),
+      map(([, pagination]) => loadTrades({ page: 1, limit: pagination?.limit ?? DEFAULT_PAGE_SIZE }))
     )
   );
 }

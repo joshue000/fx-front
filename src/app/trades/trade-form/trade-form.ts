@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
 import { AppError } from '../../core/models/app-error.model';
+import { TradeFormMode } from '../../core/models/trade-form-mode.model';
 import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
 import { UpdateTradeDto } from '../../core/dtos/update-trade.dto';
 import { MARKET_PRICES, VALID_PAIRS } from '../../core/constants/market-prices.constant';
@@ -36,8 +37,6 @@ import { ConnectionError } from '../../shared/connection-error/connection-error'
 import { Toast } from '../../shared/toast/toast';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
 import { TranslationService } from '../../core/i18n/translation.service';
-
-export type TradeFormMode = 'create' | 'view' | 'edit';
 
 @Component({
   selector: 'app-trade-form',
@@ -237,12 +236,6 @@ export class TradeForm implements OnInit {
     return this.form.get('type')?.value === OrderType.market;
   }
 
-  /**
-   * True when a cross-field price error should be displayed in the UI.
-   * The error is always computed by the validator, but shown only after
-   * the user has interacted with at least one related field (pair, side,
-   * type, or price itself), preventing premature error display on load.
-   */
   get showPriceCrossFieldError(): boolean {
     const priceControl = this.form.get('price')!;
     if (priceControl.value == null) return false;

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { TradeFormMode } from './core/models/trade-form-mode.model';
 
 export const routes: Routes = [
   {
@@ -13,16 +14,16 @@ export const routes: Routes = [
   {
     path: 'trades/new',
     loadComponent: () => import('./trades/trade-form/trade-form').then(m => m.TradeForm),
-    data: { mode: 'create' }
+    data: { mode: 'create' satisfies TradeFormMode }
   },
   {
     path: 'trades/:id/edit',
     loadComponent: () => import('./trades/trade-form/trade-form').then(m => m.TradeForm),
-    data: { mode: 'edit' }
+    data: { mode: 'edit' satisfies TradeFormMode }
   },
   {
     path: 'trades/:id',
     loadComponent: () => import('./trades/trade-form/trade-form').then(m => m.TradeForm),
-    data: { mode: 'view' }
+    data: { mode: 'view' satisfies TradeFormMode }
   }
 ];

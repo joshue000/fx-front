@@ -270,8 +270,7 @@ describe('TradesList', () => {
       expect(dispatchSpy).toHaveBeenCalledWith(deleteTrade({ id: '99' }));
     });
 
-    it('should close the modal and reload trades when deleteTradeSuccess is dispatched', () => {
-      const dispatchSpy = spyOn(store, 'dispatch');
+    it('should close the modal and show toast when deleteTradeSuccess is dispatched', () => {
       component.showDeleteModal = true;
       component.deleteTargetId = '99';
 
@@ -279,7 +278,7 @@ describe('TradesList', () => {
 
       expect(component.showDeleteModal).toBeFalse();
       expect(component.deleteTargetId).toBeNull();
-      expect(dispatchSpy).toHaveBeenCalledWith(loadTrades({ page: 1, limit: DEFAULT_PAGE_SIZE }));
+      expect(component.showToast).toBeTrue();
     });
   });
 });
