@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { PageSizeSelector, PAGE_SIZE_OPTIONS } from './page-size-selector';
 
@@ -9,6 +10,7 @@ describe('PageSizeSelector', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PageSizeSelector],
+      providers: [provideHttpClient()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PageSizeSelector);

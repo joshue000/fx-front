@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { AsyncPipe, UpperCasePipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
@@ -29,12 +29,13 @@ import { ConfirmModal } from '../../shared/confirm-modal/confirm-modal';
 import { ErrorModal } from '../../shared/error-modal/error-modal';
 import { ConnectionError } from '../../shared/connection-error/connection-error';
 import { Toast } from '../../shared/toast/toast';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
 export const DEFAULT_PAGE_SIZE = 5;
 
 @Component({
   selector: 'app-trades-list',
-  imports: [AsyncPipe, UpperCasePipe, Pagination, PageSizeSelector, ConfirmModal, ErrorModal, ConnectionError, Toast],
+  imports: [AsyncPipe, Pagination, PageSizeSelector, ConfirmModal, ErrorModal, ConnectionError, Toast, TranslatePipe],
   templateUrl: './trades-list.html',
   styleUrl: './trades-list.scss'
 })

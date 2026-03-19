@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { ConfirmModal } from './confirm-modal';
 
@@ -9,6 +10,7 @@ describe('ConfirmModal', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ConfirmModal],
+      providers: [provideHttpClient()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ConfirmModal);

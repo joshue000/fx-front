@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { Pagination } from './pagination';
 
@@ -9,6 +10,7 @@ describe('Pagination', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Pagination],
+      providers: [provideHttpClient()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Pagination);
@@ -144,7 +146,7 @@ describe('Pagination', () => {
       component.totalPages = 3;
       fixture.detectChanges();
 
-      const prevBtn = fixture.nativeElement.querySelector('[aria-label="Previous page"]');
+      const prevBtn = fixture.nativeElement.querySelector('[aria-label="pagination.previous"]');
       expect(prevBtn.disabled).toBeTrue();
     });
 
@@ -153,7 +155,7 @@ describe('Pagination', () => {
       component.totalPages = 3;
       fixture.detectChanges();
 
-      const nextBtn = fixture.nativeElement.querySelector('[aria-label="Next page"]');
+      const nextBtn = fixture.nativeElement.querySelector('[aria-label="pagination.next"]');
       expect(nextBtn.disabled).toBeTrue();
     });
 

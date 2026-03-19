@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { Router, provideRouter } from '@angular/router';
 import { Action, MemoizedSelector } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
@@ -51,6 +52,7 @@ describe('TradeForm', () => {
     await TestBed.configureTestingModule({
       imports: [TradeForm],
       providers: [
+        provideHttpClient(),
         provideRouter([]),
         provideMockStore({ initialState }),
         provideMockActions(() => actions$),
@@ -144,7 +146,7 @@ describe('TradeForm', () => {
       component.form.get('pair')?.markAsTouched();
 
       expect(component.isInvalid('pair')).toBeTrue();
-      expect(component.getPairError()).toContain('BTCUSD');
+      expect(component.getPairError()).toContain('tradeForm.error.invalidPair');
     });
 
     it('should reject the slash format (EUR/USD)', () => {
@@ -373,14 +375,14 @@ describe('TradeForm', () => {
       actions$.next(createTradeSuccess({ trade: {} as TradeOrder }));
 
       expect(component.showToast).toBeTrue();
-      expect(component.toastMessage).toBe('Trade created successfully.');
+      expect(component.toastMessage).toBe('tradeForm.toast.created');
     });
 
     it('should show the toast with the update message after updateTradeSuccess', () => {
       actions$.next(updateTradeSuccess({ trade: {} as TradeOrder }));
 
       expect(component.showToast).toBeTrue();
-      expect(component.toastMessage).toBe('Trade updated successfully.');
+      expect(component.toastMessage).toBe('tradeForm.toast.updated');
     });
 
     it('should navigate to /trades when the toast is dismissed', () => {
@@ -450,7 +452,7 @@ describe('TradeForm', () => {
 
       const info = fixture.nativeElement.querySelector('.trade-form__info');
       expect(info).not.toBeNull();
-      expect(info.textContent).toContain('market price');
+      expect(info.textContent).toContain('tradeForm.info.marketPrice');
     });
 
     it('should render a select with all valid pair options', () => {

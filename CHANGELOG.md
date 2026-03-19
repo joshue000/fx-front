@@ -6,6 +6,23 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.22] - 2026-03-19
+
+### Added
+- `public/languages/en.json` and `es.json` — all UI strings extracted into flat-key translation files; Spanish (ES) translation provided for every key
+- `TranslationService` at `core/i18n/` — loads JSON from `/languages/{lang}.json` via `HttpClient`; exposes `currentLang` signal, `setLanguage(lang)`, and `translate(key, params?)` with `{{param}}` interpolation support
+- `TranslatePipe` at `core/i18n/` — `pure: false` pipe that delegates to `TranslationService.translate(key)`; reacts to language changes on every change detection cycle
+- `Header` shared component at `shared/header/` — sticky top bar with "FX-Trades" brand on the left and an EN/ES language `<select>` on the right; calls `TranslationService.setLanguage` on change
+
+### Changed
+- `app.html` / `app.ts`: added `<app-header>` above `<router-outlet>`
+- All shared components (`ErrorModal`, `ConnectionError`, `ConfirmModal`, `PageSizeSelector`, `Pagination`, `Toast`): imported `TranslatePipe`; all static UI strings replaced with `| translate` bindings
+- `ConnectionError`: removed hardcoded default message; template falls back to `'connectionError.message' | translate` when no `message` input is provided
+- `TradesList`: imported `TranslatePipe`; all table headers, labels, buttons, aria-labels, and message bindings use `| translate`
+- `TradeForm`: imported `TranslatePipe` and injected `TranslationService`; all labels, placeholders, buttons, and error hints use `| translate`; `getPairError()` and `getPriceError()` use `TranslationService.translate()` with param substitution; `toastMessage` stores translation keys resolved by the pipe in the template
+
+---
+
 ## [0.0.21] - 2026-03-18
 
 ### Added

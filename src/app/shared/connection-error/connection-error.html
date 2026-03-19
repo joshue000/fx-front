@@ -2,15 +2,15 @@
   <div class="connection-error__icon" aria-hidden="true">
     <i class="fa-solid fa-plug-circle-xmark"></i>
   </div>
-  <h2 class="connection-error__title">Connection Error</h2>
-  <p class="connection-error__message">{{ message }}</p>
+  <h2 class="connection-error__title">{{ 'connectionError.title' | translate }}</h2>
+  <p class="connection-error__message">{{ message || ('connectionError.message' | translate) }}</p>
   <button
     class="btn btn--primary connection-error__btn"
     type="button"
-    aria-label="Retry connection"
+    [attr.aria-label]="'connectionError.retry' | translate"
     (click)="onRetry()"
   >
     <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
-    Try Again
+    {{ 'connectionError.retry' | translate }}
   </button>
 </div>

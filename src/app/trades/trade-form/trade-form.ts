@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { AsyncPipe, UpperCasePipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofType } from '@ngrx/effects';
@@ -35,12 +35,14 @@ import { PRICE_CROSS_FIELD_ERROR_KEYS } from './validators/order-price.validator
 import { ErrorModal } from '../../shared/error-modal/error-modal';
 import { ConnectionError } from '../../shared/connection-error/connection-error';
 import { Toast } from '../../shared/toast/toast';
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
+import { TranslationService } from '../../core/i18n/translation.service';
 
 export type TradeFormMode = 'create' | 'view' | 'edit';
 
 @Component({
   selector: 'app-trade-form',
-  imports: [ReactiveFormsModule, AsyncPipe, UpperCasePipe, ErrorModal, ConnectionError, Toast],
+  imports: [ReactiveFormsModule, AsyncPipe, ErrorModal, ConnectionError, Toast, TranslatePipe],
   templateUrl: './trade-form.html',
   styleUrl: './trade-form.scss',
 })
@@ -50,6 +52,7 @@ export class TradeForm implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly fb = inject(FormBuilder);
   private readonly actions$ = inject(Actions);
+  private readonly translationService = inject(TranslationService);
 
   readonly mode: TradeFormMode = this.route.snapshot.data['mode'] ?? 'create';
   readonly tradeId: string | null = this.route.snapshot.paramMap.get('id');
@@ -97,14 +100,14 @@ export class TradeForm implements OnInit {
     this.actions$
       .pipe(ofType(createTradeSuccess), takeUntilDestroyed())
       .subscribe(() => {
-        this.toastMessage = 'Trade created successfully.';
+        this.toastMessage = 'tradeForm.toast.created';
         this.showToast = true;
       });
 
     this.actions$
       .pipe(ofType(updateTradeSuccess), takeUntilDestroyed())
       .subscribe(() => {
-        this.toastMessage = 'Trade updated successfully.';
+        this.toastMessage = 'tradeForm.toast.updated';
         this.showToast = true;
       });
 
@@ -203,27 +206,29 @@ export class TradeForm implements OnInit {
   getPairError(): string | null {
     const control = this.form.get('pair')!;
     if (!control.errors) return null;
-    if (control.errors['required']) return 'Currency pair is required.';
-    if (control.errors['invalidPair']) return `Pair must be one of: ${this.validPairs.join(', ')}.`;
+    if (control.errors['required']) return this.translationService.translate('tradeForm.error.pairRequired');
+    if (control.errors['invalidPair']) {
+      return this.translationService.translate('tradeForm.error.invalidPair', { pairs: this.validPairs.join(', ') });
+    }
     return null;
   }
 
   getPriceError(): string | null {
     const control = this.form.get('price')!;
     if (!control.errors) return null;
-    if (control.errors['required']) return 'Price is required.';
-    if (control.errors['min']) return 'Price must be greater than 0.';
+    if (control.errors['required']) return this.translationService.translate('tradeForm.error.priceRequired');
+    if (control.errors['min']) return this.translationService.translate('tradeForm.error.priceTooLow');
     if (control.errors['limitBuyTooHigh']) {
-      return `Limit buy price must be below the market price (${control.errors['limitBuyTooHigh'].marketPrice}).`;
+      return this.translationService.translate('tradeForm.error.limitBuyTooHigh', { price: control.errors['limitBuyTooHigh'].marketPrice });
     }
     if (control.errors['limitSellTooLow']) {
-      return `Limit sell price must be above the market price (${control.errors['limitSellTooLow'].marketPrice}).`;
+      return this.translationService.translate('tradeForm.error.limitSellTooLow', { price: control.errors['limitSellTooLow'].marketPrice });
     }
     if (control.errors['stopBuyTooLow']) {
-      return `Stop buy price must be above the market price (${control.errors['stopBuyTooLow'].marketPrice}).`;
+      return this.translationService.translate('tradeForm.error.stopBuyTooLow', { price: control.errors['stopBuyTooLow'].marketPrice });
     }
     if (control.errors['stopSellTooHigh']) {
-      return `Stop sell price must be below the market price (${control.errors['stopSellTooHigh'].marketPrice}).`;
+      return this.translationService.translate('tradeForm.error.stopSellTooHigh', { price: control.errors['stopSellTooHigh'].marketPrice });
     }
     return null;
   }

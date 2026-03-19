@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { Router, provideRouter } from '@angular/router';
 import { Action, MemoizedSelector } from '@ngrx/store';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
@@ -67,6 +68,7 @@ describe('TradesList', () => {
     await TestBed.configureTestingModule({
       imports: [TradesList],
       providers: [
+        provideHttpClient(),
         provideRouter([]),
         provideMockStore({ initialState }),
         provideMockActions(() => actions$),
@@ -121,7 +123,7 @@ describe('TradesList', () => {
 
     const loading = fixture.nativeElement.querySelector('.trades-loading');
     expect(loading).not.toBeNull();
-    expect(loading.textContent.trim()).toBe('Loading trades...');
+    expect(loading.textContent.trim()).toBe('trades.loading');
   });
 
   it('should show an ErrorModal when an API error exists', async () => {
@@ -159,7 +161,7 @@ describe('TradesList', () => {
 
     const emptyCell = fixture.nativeElement.querySelector('.trades-table__empty');
     expect(emptyCell).not.toBeNull();
-    expect(emptyCell.textContent.trim()).toBe('No trades found.');
+    expect(emptyCell.textContent.trim()).toBe('trades.table.empty');
   });
 
   it('should return the trade id from trackById', () => {

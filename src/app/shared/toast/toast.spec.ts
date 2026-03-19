@@ -1,4 +1,5 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { Toast } from './toast';
 
@@ -9,6 +10,7 @@ describe('Toast', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Toast],
+      providers: [provideHttpClient()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Toast);

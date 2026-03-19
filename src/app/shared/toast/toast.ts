@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
+
 @Component({
   selector: 'app-toast',
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './toast.html',
   styleUrl: './toast.scss',
 })

@@ -1,29 +1,29 @@
 <section class="trade-form-page">
   <header class="trade-form-page__header">
-    <button class="btn btn--outline" (click)="goBack()">← Back to Trades</button>
+    <button class="btn btn--outline" (click)="goBack()">{{ 'tradeForm.back' | translate }}</button>
     <h1 class="trade-form-page__title">
-      @if (mode === 'create') { New Trade Order }
-      @else if (mode === 'edit') { Edit Trade Order }
-      @else { Trade Details }
+      @if (mode === 'create') { {{ 'tradeForm.title.create' | translate }} }
+      @else if (mode === 'edit') { {{ 'tradeForm.title.edit' | translate }} }
+      @else { {{ 'tradeForm.title.view' | translate }} }
     </h1>
   </header>
 
   @if (isNetworkLoadError$ | async) {
     <app-connection-error (retry)="onRetry()" />
   } @else if (mode !== 'create' && (loadingOne$ | async)) {
-    <div class="trade-form__loading">Loading trade...</div>
+    <div class="trade-form__loading">{{ 'tradeForm.loading' | translate }}</div>
   } @else {
     <form class="trade-form" [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="trade-form__group">
-        <label class="trade-form__label" for="pair">Currency Pair</label>
+        <label class="trade-form__label" for="pair">{{ 'tradeForm.label.pair' | translate }}</label>
         <select
           id="pair"
           class="trade-form__select"
           [class.trade-form__input--invalid]="isInvalid('pair')"
           formControlName="pair"
-          aria-label="Currency pair"
+          [attr.aria-label]="'tradeForm.label.pair' | translate"
         >
-          <option value="">Select pair</option>
+          <option value="">{{ 'tradeForm.placeholder.pair' | translate }}</option>
           @for (pair of validPairs; track pair) {
             <option [value]="pair">{{ pair }}</option>
           }
@@ -35,47 +35,47 @@
 
       <div class="trade-form__row">
         <div class="trade-form__group">
-          <label class="trade-form__label" for="side">Side</label>
+          <label class="trade-form__label" for="side">{{ 'tradeForm.label.side' | translate }}</label>
           <select
             id="side"
             class="trade-form__select"
             [class.trade-form__input--invalid]="isInvalid('side')"
             formControlName="side"
-            aria-label="Order side"
+            [attr.aria-label]="'tradeForm.label.side' | translate"
           >
-            <option value="">Select side</option>
+            <option value="">{{ 'tradeForm.placeholder.side' | translate }}</option>
             @for (side of orderSides; track side) {
-              <option [value]="side">{{ side | uppercase }}</option>
+              <option [value]="side">{{ ('tradeForm.option.side.' + side) | translate }}</option>
             }
           </select>
           @if (isInvalid('side')) {
-            <span class="trade-form__hint">Side is required.</span>
+            <span class="trade-form__hint">{{ 'tradeForm.error.sideRequired' | translate }}</span>
           }
         </div>
 
         <div class="trade-form__group">
-          <label class="trade-form__label" for="type">Type</label>
+          <label class="trade-form__label" for="type">{{ 'tradeForm.label.type' | translate }}</label>
           <select
             id="type"
             class="trade-form__select"
             [class.trade-form__input--invalid]="isInvalid('type')"
             formControlName="type"
-            aria-label="Order type"
+            [attr.aria-label]="'tradeForm.label.type' | translate"
           >
-            <option value="">Select type</option>
+            <option value="">{{ 'tradeForm.placeholder.type' | translate }}</option>
             @for (type of orderTypes; track type) {
-              <option [value]="type">{{ type | uppercase }}</option>
+              <option [value]="type">{{ ('tradeForm.option.type.' + type) | translate }}</option>
             }
           </select>
           @if (isInvalid('type')) {
-            <span class="trade-form__hint">Type is required.</span>
+            <span class="trade-form__hint">{{ 'tradeForm.error.typeRequired' | translate }}</span>
           }
         </div>
       </div>
 
       <div class="trade-form__row">
         <div class="trade-form__group">
-          <label class="trade-form__label" for="amount">Amount</label>
+          <label class="trade-form__label" for="amount">{{ 'tradeForm.label.amount' | translate }}</label>
           <input
             id="amount"
             class="trade-form__input"
@@ -85,15 +85,15 @@
             placeholder="0.00"
             min="0.01"
             step="0.01"
-            aria-label="Trade amount"
+            [attr.aria-label]="'tradeForm.label.amount' | translate"
           />
           @if (isInvalid('amount')) {
-            <span class="trade-form__hint">Amount must be greater than 0.</span>
+            <span class="trade-form__hint">{{ 'tradeForm.error.amountRequired' | translate }}</span>
           }
         </div>
 
         <div class="trade-form__group">
-          <label class="trade-form__label" for="price">Price</label>
+          <label class="trade-form__label" for="price">{{ 'tradeForm.label.price' | translate }}</label>
           <input
             id="price"
             class="trade-form__input"
@@ -103,10 +103,10 @@
             placeholder="0.00"
             min="0.0001"
             step="0.0001"
-            aria-label="Trade price"
+            [attr.aria-label]="'tradeForm.label.price' | translate"
           />
           @if (isMarketOrder) {
-            <span class="trade-form__info">Auto-filled with current market price.</span>
+            <span class="trade-form__info">{{ 'tradeForm.info.marketPrice' | translate }}</span>
           } @else if (isInvalid('price') || showPriceCrossFieldError) {
             <span class="trade-form__hint">{{ getPriceError() }}</span>
           }
@@ -115,38 +115,40 @@
 
       <div class="trade-form__group">
         <label class="trade-form__label" for="status">
-          Status <span class="trade-form__optional">(optional)</span>
+          {{ 'tradeForm.label.status' | translate }}
+          <span class="trade-form__optional">{{ 'tradeForm.optional' | translate }}</span>
         </label>
         <select
           id="status"
           class="trade-form__select"
           formControlName="status"
-          aria-label="Order status"
+          [attr.aria-label]="'tradeForm.label.status' | translate"
         >
-          <option value="">Select status</option>
+          <option value="">{{ 'tradeForm.placeholder.status' | translate }}</option>
           @for (status of orderStatuses; track status) {
-            <option [value]="status">{{ status | uppercase }}</option>
+            <option [value]="status">{{ ('tradeForm.option.status.' + status) | translate }}</option>
           }
         </select>
       </div>
 
       <footer class="trade-form__footer">
         <button type="button" class="btn btn--outline" (click)="goBack()">
-          @if (mode === 'view') { Close } @else { Cancel }
+          @if (mode === 'view') { {{ 'tradeForm.button.close' | translate }} }
+          @else { {{ 'tradeForm.button.cancel' | translate }} }
         </button>
         @if (mode !== 'view') {
           <button
             type="submit"
             class="btn btn--primary"
             [disabled]="(submitting$ | async) || form.invalid"
-            aria-label="Submit trade form"
+            [attr.aria-label]="'tradeForm.button.createOrder' | translate"
           >
             @if (submitting$ | async) {
-              Submitting...
+              {{ 'tradeForm.button.submitting' | translate }}
             } @else if (mode === 'edit') {
-              Save Changes
+              {{ 'tradeForm.button.saveChanges' | translate }}
             } @else {
-              Create Order
+              {{ 'tradeForm.button.createOrder' | translate }}
             }
           </button>
         }
@@ -171,7 +173,7 @@
 
 @if (showToast) {
   <app-toast
-    [message]="toastMessage"
+    [message]="toastMessage | translate"
     [duration]="2000"
     (dismissed)="onToastDismissed()"
   />

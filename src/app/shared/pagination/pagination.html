@@ -1,10 +1,10 @@
-<nav class="pagination" aria-label="Pagination">
+<nav class="pagination" [attr.aria-label]="'pagination.label' | translate">
   <button
     class="pagination__btn pagination__btn--nav"
     [class.pagination__btn--disabled]="!hasPrevious"
     [disabled]="!hasPrevious"
     (click)="previous()"
-    aria-label="Previous page"
+    [attr.aria-label]="'pagination.previous' | translate"
   >
     ‹
   </button>
@@ -18,7 +18,7 @@
         [class.pagination__btn--active]="page === currentPage"
         (click)="goTo(page)"
         [attr.aria-current]="page === currentPage ? 'page' : null"
-        [attr.aria-label]="'Page ' + page"
+        [attr.aria-label]="('pagination.page' | translate) + ' ' + page"
       >
         {{ page }}
       </button>
@@ -30,7 +30,7 @@
     [class.pagination__btn--disabled]="!hasNext"
     [disabled]="!hasNext"
     (click)="next()"
-    aria-label="Next page"
+    [attr.aria-label]="'pagination.next' | translate"
   >
     ›
   </button>

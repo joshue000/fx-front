@@ -1,0 +1,13 @@
+<header class="app-header">
+  <span class="app-header__title">{{ 'header.title' | translate }}</span>
+
+  <select
+    class="app-header__lang-select"
+    [value]="currentLang()"
+    (change)="onLangChange($event)"
+    aria-label="Select language"
+  >
+    <option value="en">{{ 'header.lang.en' | translate }}</option>
+    <option value="es">{{ 'header.lang.es' | translate }}</option>
+  </select>
+</header>

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 
 import { ErrorModal } from './error-modal';
 
@@ -9,6 +10,7 @@ describe('ErrorModal', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ErrorModal],
+      providers: [provideHttpClient()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ErrorModal);

@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
+
 @Component({
   selector: 'app-confirm-modal',
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './confirm-modal.html',
   styleUrl: './confirm-modal.scss',
 })

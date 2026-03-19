@@ -1,10 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
+import { TranslatePipe } from '../../core/i18n/translate.pipe';
+
 export const PAGE_SIZE_OPTIONS = [5, 10, 20] as const;
 
 @Component({
   selector: 'app-page-size-selector',
-  imports: [],
+  imports: [TranslatePipe],
   templateUrl: './page-size-selector.html',
   styleUrl: './page-size-selector.scss',
 })

@@ -3,16 +3,16 @@
     <div class="modal__icon" aria-hidden="true">
       <i class="fa-solid fa-circle-exclamation"></i>
     </div>
-    <h2 id="error-modal-title" class="modal__title">Something went wrong</h2>
+    <h2 id="error-modal-title" class="modal__title">{{ 'errorModal.title' | translate }}</h2>
     <p class="modal__message">{{ message }}</p>
     <div class="modal__actions">
       <button
         class="modal__btn modal__btn--dismiss"
         type="button"
-        aria-label="Close error dialog"
+        [attr.aria-label]="'errorModal.close' | translate"
         (click)="onDismiss()"
       >
-        Close
+        {{ 'errorModal.close' | translate }}
       </button>
     </div>
   </div>

@@ -1,26 +1,26 @@
 <section class="trades-page">
   <header class="trades-page__header">
-    <h1 class="trades-page__title">Trades</h1>
-    <button class="btn btn--primary" (click)="goToCreate()">+ New Trade</button>
+    <h1 class="trades-page__title">{{ 'trades.title' | translate }}</h1>
+    <button class="btn btn--primary" (click)="goToCreate()">{{ 'trades.newButton' | translate }}</button>
   </header>
 
   @if (isNetworkError$ | async) {
     <app-connection-error (retry)="onRetry()" />
   } @else {
     @if (loading$ | async) {
-      <div class="trades-loading">Loading trades...</div>
+      <div class="trades-loading">{{ 'trades.loading' | translate }}</div>
     } @else if (trades$ | async; as trades) {
       <div class="trades-table-wrapper">
         <table class="trades-table">
           <thead>
             <tr>
-              <th>Pair</th>
-              <th>Side</th>
-              <th>Type</th>
-              <th>Amount</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{{ 'trades.table.pair' | translate }}</th>
+              <th>{{ 'trades.table.side' | translate }}</th>
+              <th>{{ 'trades.table.type' | translate }}</th>
+              <th>{{ 'trades.table.amount' | translate }}</th>
+              <th>{{ 'trades.table.price' | translate }}</th>
+              <th>{{ 'trades.table.status' | translate }}</th>
+              <th>{{ 'trades.table.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -29,38 +29,38 @@
                 <td class="trades-table__pair">{{ trade.pair }}</td>
                 <td>
                   <span class="badge badge--side badge--{{ trade.side }}">
-                    {{ trade.side | uppercase }}
+                    {{ ('tradeForm.option.side.' + trade.side) | translate }}
                   </span>
                 </td>
-                <td class="trades-table__type">{{ trade.type | uppercase }}</td>
+                <td class="trades-table__type">{{ ('tradeForm.option.type.' + trade.type) | translate }}</td>
                 <td class="trades-table__amount">{{ trade.amount }}</td>
                 <td class="trades-table__price">${{ trade.price }}</td>
                 <td>
                   <span class="badge badge--status badge--{{ trade.status }}">
-                    {{ trade.status | uppercase }}
+                    {{ ('tradeForm.option.status.' + trade.status) | translate }}
                   </span>
                 </td>
                 <td class="trades-table__actions">
                   <button
                     class="btn-icon btn-icon--view"
-                    title="View details"
-                    aria-label="View details"
+                    [title]="'trades.actions.view' | translate"
+                    [attr.aria-label]="'trades.actions.view' | translate"
                     (click)="goToDetail(trade.id)"
                   >
                     <i class="fa-solid fa-eye" aria-hidden="true"></i>
                   </button>
                   <button
                     class="btn-icon btn-icon--edit"
-                    title="Edit order"
-                    aria-label="Edit order"
+                    [title]="'trades.actions.edit' | translate"
+                    [attr.aria-label]="'trades.actions.edit' | translate"
                     (click)="goToEdit(trade.id)"
                   >
                     <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
                   </button>
                   <button
                     class="btn-icon btn-icon--delete"
-                    title="Delete order"
-                    aria-label="Delete order"
+                    [title]="'trades.actions.delete' | translate"
+                    [attr.aria-label]="'trades.actions.delete' | translate"
                     (click)="onDelete(trade.id)"
                   >
                     <i class="fa-solid fa-trash" aria-hidden="true"></i>
@@ -69,7 +69,7 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="7" class="trades-table__empty">No trades found.</td>
+                <td colspan="7" class="trades-table__empty">{{ 'trades.table.empty' | translate }}</td>
               </tr>
             }
           </tbody>
@@ -113,14 +113,14 @@
 
 @if (showToast) {
   <app-toast
-    message="Trade deleted successfully."
+    [message]="'trades.delete.toast' | translate"
     (dismissed)="onToastDismissed()"
   />
 }
 
 @if (showDeleteModal) {
   <app-confirm-modal
-    message="Are you sure you want to delete this trade? This action cannot be undone."
+    [message]="'trades.delete.confirm' | translate"
     (confirmed)="onDeleteConfirmed()"
     (cancelled)="onDeleteCancelled()"
   />
