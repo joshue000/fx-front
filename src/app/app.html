@@ -1,2 +1,5 @@
 <app-header />
+@if (isLoading$ | async) {
+  <app-loading-spinner />
+}
 <router-outlet />

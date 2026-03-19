@@ -10,8 +10,6 @@
 
   @if (isNetworkLoadError$ | async) {
     <app-connection-error (retry)="onRetry()" />
-  } @else if (mode !== 'create' && (loadingOne$ | async)) {
-    <div class="trade-form__loading">{{ 'tradeForm.loading' | translate }}</div>
   } @else {
     <form class="trade-form" [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="trade-form__group">

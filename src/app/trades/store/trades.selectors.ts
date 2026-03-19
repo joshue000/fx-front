@@ -70,3 +70,8 @@ export const selectTradesDeleteError = createSelector(
   selectTradesState,
   state => state.deleteError
 );
+
+export const selectIsLoading = createSelector(
+  selectTradesState,
+  state => state.loading || state.loadingOne
+);

@@ -115,15 +115,14 @@ describe('TradesList', () => {
     expect(rows[0].querySelector('.trades-table__pair').textContent.trim()).toBe('EUR/USD');
   });
 
-  it('should display the loading indicator when loading is true', async () => {
+  it('should not render the table while loading', async () => {
+    mockSelectTrades.setResult([mockTrade]);
     mockSelectLoading.setResult(true);
     store.refreshState();
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const loading = fixture.nativeElement.querySelector('.trades-loading');
-    expect(loading).not.toBeNull();
-    expect(loading.textContent.trim()).toBe('trades.loading');
+    expect(fixture.nativeElement.querySelector('.trades-table')).toBeNull();
   });
 
   it('should show an ErrorModal when an API error exists', async () => {
@@ -197,6 +196,7 @@ describe('TradesList', () => {
 
   it('should show the pagination component when totalPages > 1', async () => {
     mockSelectTrades.setResult([mockTrade]);
+    mockSelectLoading.setResult(false);
     mockSelectPagination.setResult(mockPagination);
     store.refreshState();
     fixture.detectChanges();
@@ -208,6 +208,7 @@ describe('TradesList', () => {
 
   it('should not show the pagination component when totalPages is 1', async () => {
     mockSelectTrades.setResult([mockTrade]);
+    mockSelectLoading.setResult(false);
     mockSelectPagination.setResult({ ...mockPagination, totalPages: 1 });
     store.refreshState();
     fixture.detectChanges();
