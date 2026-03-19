@@ -6,6 +6,14 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.20] - 2026-03-18
+
+### Added
+- `main.ts`: logs `Welcome to FX-Front v<version>` to the console on bootstrap, reading the version directly from `package.json`
+- `tsconfig.app.json`: enabled `resolveJsonModule` to allow importing `package.json`
+
+---
+
 ## [0.0.19] - 2026-03-18
 
 ### Added
