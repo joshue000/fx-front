@@ -168,3 +168,11 @@
     (dismissed)="onSubmitErrorDismissed()"
   />
 }
+
+@if (showToast) {
+  <app-toast
+    [message]="toastMessage"
+    [duration]="2000"
+    (dismissed)="onToastDismissed()"
+  />
+}

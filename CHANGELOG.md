@@ -6,6 +6,23 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.22] - 2026-03-18
+
+### Changed
+- `TradeForm`: on `createTradeSuccess` shows toast "Trade created successfully." instead of navigating immediately; on `updateTradeSuccess` shows toast "Trade updated successfully."; navigation to `/trades` happens when the toast dismisses (after 2 s)
+- `trade-form.spec.ts`: updated success navigation tests to assert toast state and message; added test for `onToastDismissed` navigating to `/trades`
+
+---
+
+## [0.0.21] - 2026-03-18
+
+### Added
+- `Toast` shared component at `shared/toast/` — fixed bottom-right notification with a green success style, a close button, and auto-dismiss after a configurable `duration` (default 4000 ms); emits `dismissed` for parent cleanup
+- `toast.spec.ts` — 6 tests covering rendering, manual close, auto-dismiss timing, custom duration, and cleanup on destroy
+- `TradesList`: shows `Toast` with "Trade deleted successfully." after a confirmed delete succeeds; error path unchanged (still uses `ErrorModal`)
+
+---
+
 ## [0.0.20] - 2026-03-18
 
 ### Added

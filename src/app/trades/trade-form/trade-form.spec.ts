@@ -369,20 +369,25 @@ describe('TradeForm', () => {
       expect(router.navigate).toHaveBeenCalledWith(['/trades']);
     });
 
-    it('should navigate to /trades after createTradeSuccess action', () => {
-      const router = TestBed.inject(Router);
-      spyOn(router, 'navigate');
-
+    it('should show the toast with the create message after createTradeSuccess', () => {
       actions$.next(createTradeSuccess({ trade: {} as TradeOrder }));
 
-      expect(router.navigate).toHaveBeenCalledWith(['/trades']);
+      expect(component.showToast).toBeTrue();
+      expect(component.toastMessage).toBe('Trade created successfully.');
     });
 
-    it('should navigate to /trades after updateTradeSuccess action', () => {
+    it('should show the toast with the update message after updateTradeSuccess', () => {
+      actions$.next(updateTradeSuccess({ trade: {} as TradeOrder }));
+
+      expect(component.showToast).toBeTrue();
+      expect(component.toastMessage).toBe('Trade updated successfully.');
+    });
+
+    it('should navigate to /trades when the toast is dismissed', () => {
       const router = TestBed.inject(Router);
       spyOn(router, 'navigate');
 
-      actions$.next(updateTradeSuccess({ trade: {} as TradeOrder }));
+      component.onToastDismissed();
 
       expect(router.navigate).toHaveBeenCalledWith(['/trades']);
     });
