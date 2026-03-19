@@ -6,6 +6,29 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.26] - 2026-03-19
+
+### Added
+- Dark mode support with a toggle button in the header (next to the language selector)
+- `ThemeService` at `core/services/theme.service.ts` — manages dark/light state via Angular `signal()`; persists preference to `localStorage`; respects `prefers-color-scheme` on first visit; applies `body.dark` class via `effect()`
+- `LoadingSpinner`: switches asset between `spinner_.svg` (light) and `spinner_dark.svg` (dark) using a dynamic `[src]` binding driven by `ThemeService.isDark()`
+- Full CSS variable palette for dark mode in `styles.scss` — `body.dark` overrides all `--clr-*` tokens including surface, border, text, primary, button, badge, and form error colors
+
+### Changed
+- All component SCSS files updated to use CSS custom properties (`var(--clr-*)`) replacing all hardcoded colors — enables cascade-based dark mode without `:host-context` or `::ng-deep`
+- `styles.scss`: added `margin: 0` on `html, body` to remove browser default 8px margin
+- `styles.scss`: added `height: 100%` on `html, body` and `router-outlet + * { flex: 1 }` so the app fills the full viewport height
+- `app.scss`: `:host` is now a flex column with `min-height: 100vh`
+- Badge colors (buy/sell/open/executed) now use CSS variables; dark mode uses darker tinted backgrounds with high-contrast text
+- Form error block and hint/info colors now use CSS variables
+- Trade form primary button aligned to `var(--clr-primary)` / `var(--clr-primary-hover)` for consistency with the design system
+
+### Fixed
+- Responsive pagination footer: on screens ≤ 640px the row-size selector stacks below the paginator (`flex-direction: column`)
+- Responsive paginator: on screens ≤ 640px only the prev/next arrows and the current active page number are shown; all other page buttons and ellipsis are hidden
+
+---
+
 ## [0.0.25] - 2026-03-19
 
 ### Added
