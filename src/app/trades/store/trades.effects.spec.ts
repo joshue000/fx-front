@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Action } from '@ngrx/store';
 import { provideMockActions } from '@ngrx/effects/testing';
+import { provideMockStore, MockStore } from '@ngrx/store/testing';
 import { ReplaySubject, of, throwError } from 'rxjs';
 
 import { TradesEffects } from './trades.effects';
@@ -9,10 +10,13 @@ import {
   createTrade,
   createTradeFailure,
   createTradeSuccess,
+  deleteTradeSuccess,
   loadTrades,
   loadTradesFailure,
   loadTradesSuccess,
 } from './trades.actions';
+import { selectTradesPagination } from './trades.selectors';
+import { DEFAULT_PAGE_SIZE } from '../constants/trades.constants';
 import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
 import { CreateTradeDto } from '../../core/dtos/create-trade.dto';
 import { PaginatedResponse, PaginationMetadata } from '../../core/models/paginated-response.model';
@@ -45,6 +49,7 @@ describe('TradesEffects', () => {
   let actions$: ReplaySubject<Action>;
   let effects: TradesEffects;
   let tradesServiceSpy: jasmine.SpyObj<TradesService>;
+  let store: MockStore;
 
   beforeEach(() => {
     actions$ = new ReplaySubject<Action>(1);
@@ -54,11 +59,17 @@ describe('TradesEffects', () => {
       providers: [
         TradesEffects,
         provideMockActions(() => actions$),
+        provideMockStore(),
         { provide: TradesService, useValue: tradesServiceSpy },
       ],
     });
 
     effects = TestBed.inject(TradesEffects);
+    store = TestBed.inject(MockStore);
+  });
+
+  afterEach(() => {
+    store.resetSelectors();
   });
 
   describe('loadTrades$', () => {
@@ -159,6 +170,32 @@ describe('TradesEffects', () => {
       });
 
       actions$.next(createTrade({ dto: mockDto }));
+    });
+  });
+
+  describe('reloadAfterDelete$', () => {
+    it('should dispatch loadTrades with limit from stored pagination after deleteTradeSuccess', (done) => {
+      store.overrideSelector(selectTradesPagination, mockPagination);
+      store.refreshState();
+
+      effects.reloadAfterDelete$.subscribe((action) => {
+        expect(action).toEqual(loadTrades({ page: 1, limit: mockPagination.limit }));
+        done();
+      });
+
+      actions$.next(deleteTradeSuccess({ id: '1' }));
+    });
+
+    it('should fallback to DEFAULT_PAGE_SIZE when pagination is null', (done) => {
+      store.overrideSelector(selectTradesPagination, null);
+      store.refreshState();
+
+      effects.reloadAfterDelete$.subscribe((action) => {
+        expect(action).toEqual(loadTrades({ page: 1, limit: DEFAULT_PAGE_SIZE }));
+        done();
+      });
+
+      actions$.next(deleteTradeSuccess({ id: '1' }));
     });
   });
 });

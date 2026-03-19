@@ -31,7 +31,9 @@ import { ConnectionError } from '../../shared/connection-error/connection-error'
 import { Toast } from '../../shared/toast/toast';
 import { TranslatePipe } from '../../core/i18n/translate.pipe';
 
-export const DEFAULT_PAGE_SIZE = 5;
+import { DEFAULT_PAGE_SIZE } from '../constants/trades.constants';
+
+export { DEFAULT_PAGE_SIZE };
 
 @Component({
   selector: 'app-trades-list',
@@ -67,7 +69,6 @@ export class TradesList implements OnInit {
         this.showDeleteModal = false;
         this.deleteTargetId = null;
         this.showToast = true;
-        this.store.dispatch(loadTrades({ page: 1, limit: this.currentPageSize }));
       });
   }
 

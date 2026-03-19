@@ -6,6 +6,15 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.25] - 2026-03-19
+
+### Added
+- `timeoutInterceptor` at `core/interceptors/timeout.interceptor.ts` — global HTTP interceptor that applies a configurable timeout to every outgoing request; `TimeoutError` is mapped to `{ status: 0 }` so the existing network error path in effects handles it as a connection failure without any additional changes
+- `HTTP_TIMEOUT` injection token — defaults to `30 000 ms`; can be overridden per environment or in tests
+- Registered globally via `provideHttpClient(withInterceptors([timeoutInterceptor]))` in `app.config.ts`
+
+---
+
 ## [0.0.24] - 2026-03-19
 
 ### Fixed
