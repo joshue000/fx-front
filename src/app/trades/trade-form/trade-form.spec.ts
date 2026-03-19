@@ -15,7 +15,7 @@ import {
 } from '../store/trades.selectors';
 import { TradesState } from '../store/trades.state';
 import { TRADES_FEATURE_KEY } from '../store/trades.selectors';
-import { OrderSide, OrderStatus, OrderType } from '../../core/models/trade-order.model';
+import { OrderSide, OrderStatus, OrderType, TradeOrder } from '../../core/models/trade-order.model';
 import { AppError } from '../../core/models/app-error.model';
 import { MARKET_PRICES } from '../../core/constants/market-prices.constant';
 
@@ -373,7 +373,7 @@ describe('TradeForm', () => {
       const router = TestBed.inject(Router);
       spyOn(router, 'navigate');
 
-      actions$.next(createTradeSuccess({ trade: {} as any }));
+      actions$.next(createTradeSuccess({ trade: {} as TradeOrder }));
 
       expect(router.navigate).toHaveBeenCalledWith(['/trades']);
     });
@@ -382,7 +382,7 @@ describe('TradeForm', () => {
       const router = TestBed.inject(Router);
       spyOn(router, 'navigate');
 
-      actions$.next(updateTradeSuccess({ trade: {} as any }));
+      actions$.next(updateTradeSuccess({ trade: {} as TradeOrder }));
 
       expect(router.navigate).toHaveBeenCalledWith(['/trades']);
     });

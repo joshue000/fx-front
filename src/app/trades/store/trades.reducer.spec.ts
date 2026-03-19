@@ -38,7 +38,7 @@ const apiError: AppError = { kind: 'api', message: 'Bad Request' };
 
 describe('tradesReducer', () => {
   it('should return the initial state when an unknown action is dispatched', () => {
-    const action = { type: '[Unknown] Action' } as any;
+    const action = { type: '[Unknown] Action' };
     const state = tradesReducer(undefined, action);
     expect(state).toEqual(initialTradesState);
   });

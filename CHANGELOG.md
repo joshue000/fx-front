@@ -6,6 +6,13 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.19] - 2026-03-18
+
+### Added
+- `.github/workflows/ci-cd.yml` — GitHub Actions pipeline: `test` on every PR; `test → build-and-push → deploy` on push to `master`; image published to GHCR; deploy via SSH using `appleboy/ssh-action`
+
+---
+
 ## [0.0.18] - 2026-03-17
 
 ### Added

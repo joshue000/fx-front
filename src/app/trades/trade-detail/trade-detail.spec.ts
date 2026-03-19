@@ -6,7 +6,7 @@ import { TradeDetail } from './trade-detail';
 const buildActivatedRoute = (id: string | null) => ({
   snapshot: {
     paramMap: {
-      get: (_key: string) => id,
+      get: () => id,
     },
   },
 });

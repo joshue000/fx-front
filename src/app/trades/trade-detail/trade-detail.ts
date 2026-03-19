@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -8,12 +8,12 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrl: './trade-detail.scss'
 })
 export class TradeDetail {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+
   protected readonly tradeId = signal<string>('');
 
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly router: Router
-  ) {
+  constructor() {
     const id = this.route.snapshot.paramMap.get('id') ?? '';
     this.tradeId.set(id);
   }

@@ -59,7 +59,6 @@ describe('TradesList', () => {
   let mockSelectTrades: MemoizedSelector<object, TradeOrder[]>;
   let mockSelectLoading: MemoizedSelector<object, boolean>;
   let mockSelectError: MemoizedSelector<object, AppError | null>;
-  let mockSelectDeleteError: MemoizedSelector<object, AppError | null>;
   let mockSelectPagination: MemoizedSelector<object, PaginationMetadata | null>;
 
   beforeEach(async () => {
@@ -78,7 +77,7 @@ describe('TradesList', () => {
     mockSelectTrades = store.overrideSelector(selectTrades, []);
     mockSelectLoading = store.overrideSelector(selectTradesLoading, false);
     mockSelectError = store.overrideSelector(selectTradesError, null);
-    mockSelectDeleteError = store.overrideSelector(selectTradesDeleteError, null);
+    store.overrideSelector(selectTradesDeleteError, null);
     mockSelectPagination = store.overrideSelector(selectTradesPagination, null);
 
     fixture = TestBed.createComponent(TradesList);

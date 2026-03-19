@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -10,9 +10,8 @@ import { PaginatedResponse } from '../../core/models/paginated-response.model';
 
 @Injectable({ providedIn: 'root' })
 export class TradesService {
+  private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/trade_orders`;
-
-  constructor(private readonly http: HttpClient) {}
 
   getTrades(page: number, limit: number): Observable<PaginatedResponse<TradeOrder>> {
     const params = new HttpParams()
