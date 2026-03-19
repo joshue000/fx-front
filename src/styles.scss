@@ -28,6 +28,17 @@
   --clr-btn-del-bg:     #fff1f2;
   --clr-btn-del-hover:  #ffe4e6;
   --clr-btn-del-text:   #e11d48;
+  --clr-badge-buy-bg:   #d1fae5;
+  --clr-badge-buy-text: #065f46;
+  --clr-badge-sell-bg:  #fee2e2;
+  --clr-badge-sell-text:#991b1b;
+  --clr-badge-open-bg:  #dbeafe;
+  --clr-badge-open-text:#1e40af;
+  --clr-form-error-bg:    #fef2f2;
+  --clr-form-error-border:#fca5a5;
+  --clr-form-error-text:  #b91c1c;
+  --clr-form-focus:       #6366f1;
+  --clr-form-invalid:     #ef4444;
 }
 
 /* ─── Dark mode ─────────────────────────────────────────────────────────────── */
@@ -58,13 +69,30 @@ body.dark {
   --clr-btn-del-bg:     #3f0f1a;
   --clr-btn-del-hover:  #4f1525;
   --clr-btn-del-text:   #ffffff;
+  --clr-badge-buy-bg:   #064e3b;
+  --clr-badge-buy-text: #6ee7b7;
+  --clr-badge-sell-bg:  #450a0a;
+  --clr-badge-sell-text:#fca5a5;
+  --clr-badge-open-bg:  #1e3a5f;
+  --clr-badge-open-text:#93c5fd;
+  --clr-form-error-bg:    #450a0a;
+  --clr-form-error-border:#991b1b;
+  --clr-form-error-text:  #fca5a5;
+  --clr-form-focus:       #818cf8;
+  --clr-form-invalid:     #f87171;
 }
 
 html, body {
+  height: 100%;
+  margin: 0;
   font-family: 'Inter', sans-serif;
   background: var(--clr-bg);
   color: var(--clr-text-2);
   transition: background 0.2s ease, color 0.2s ease;
+}
+
+router-outlet + * {
+  flex: 1;
 }
 
 .loading-spinner {

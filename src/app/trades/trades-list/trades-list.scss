@@ -161,23 +161,23 @@
   letter-spacing: 0.04em;
 
   &--buy {
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--clr-badge-buy-bg);
+    color: var(--clr-badge-buy-text);
   }
 
   &--sell {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--clr-badge-sell-bg);
+    color: var(--clr-badge-sell-text);
   }
 
   &--open {
-    background: #dbeafe;
-    color: #1e40af;
+    background: var(--clr-badge-open-bg);
+    color: var(--clr-badge-open-text);
   }
 
   &--executed {
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--clr-badge-buy-bg);
+    color: var(--clr-badge-buy-text);
   }
 
   &--cancelled {
