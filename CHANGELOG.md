@@ -6,6 +6,15 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.24] - 2026-03-19
+
+### Fixed
+- `LoadingSpinner`: component that shows an spinner when `isLoading` input is `true`; used in `TradeForm` to replace the previous loading message; includes unit tests for rendering and input binding
+- `TradeForm`: replaced the previous loading message with `LoadingSpinner` when `loadingOne$` is `true` in view/edit modes; loading spinner is not shown in create mode since there is no initial data fetch; error handling remains unchanged (still shows `ConnectionError` on network errors and `ErrorModal` on API errors)
+
+
+---
+
 ## [0.0.23] - 2026-03-19
 
 ### Fixed

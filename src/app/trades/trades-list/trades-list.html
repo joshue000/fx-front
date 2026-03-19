@@ -6,10 +6,8 @@
 
   @if (isNetworkError$ | async) {
     <app-connection-error (retry)="onRetry()" />
-  } @else {
-    @if (loading$ | async) {
-      <div class="trades-loading">{{ 'trades.loading' | translate }}</div>
-    } @else if (trades$ | async; as trades) {
+  } @else if ((loading$ | async) === false) {
+    @if (trades$ | async; as trades) {
       <div class="trades-table-wrapper">
         <table class="trades-table">
           <thead>

@@ -26,7 +26,6 @@ import {
   selectTradesCreateError,
   selectTradesCreating,
   selectTradesLoadOneError,
-  selectTradesLoadingOne,
   selectTradesUpdateError,
   selectTradesUpdating,
 } from '../store/trades.selectors';
@@ -56,8 +55,6 @@ export class TradeForm implements OnInit {
 
   readonly mode: TradeFormMode = this.route.snapshot.data['mode'] ?? 'create';
   readonly tradeId: string | null = this.route.snapshot.paramMap.get('id');
-
-  readonly loadingOne$: Observable<boolean> = this.store.select(selectTradesLoadingOne);
 
   private readonly loadOneError$ = this.store.select(selectTradesLoadOneError);
   readonly isNetworkLoadError$: Observable<boolean> = this.loadOneError$.pipe(
