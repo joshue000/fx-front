@@ -17,7 +17,7 @@
   &__title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #1a1a2e;
+    color: var(--clr-text-1);
     margin: 0;
   }
 }
@@ -31,30 +31,31 @@
 .trades-table {
   width: 100%;
   border-collapse: collapse;
-  background: #ffffff;
+  background: var(--clr-surface);
   font-size: 0.875rem;
 
   thead {
-    background: #f5f7fa;
+    background: var(--clr-surface-alt);
   }
 
   th {
     padding: 0.875rem 1rem;
-    text-align: left;
+    text-align: center;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--clr-text-3);
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.05em;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--clr-border);
+
   }
 
   &__row {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--clr-border);
     transition: background 0.15s ease;
 
     &:hover {
-      background: #f9fafb;
+      background: var(--clr-surface-hover);
     }
 
     &:last-child {
@@ -64,17 +65,18 @@
 
   td {
     padding: 0.875rem 1rem;
-    color: #374151;
+    color: var(--clr-text-2);
     vertical-align: middle;
+    text-align: center;
   }
 
   &__pair {
     font-weight: 600;
-    color: #1a1a2e;
+    color: var(--clr-text-1);
   }
 
   &__type {
-    color: #6b7280;
+    color: var(--clr-text-3);
   }
 
   &__amount,
@@ -84,7 +86,7 @@
 
   &__empty {
     text-align: center;
-    color: #9ca3af;
+    color: var(--clr-text-4);
     padding: 2.5rem 1rem;
     font-style: italic;
   }
@@ -101,11 +103,23 @@
     display: flex;
     justify-content: center;
   }
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+
+    &__pagination {
+      flex: unset;
+      width: 100%;
+    }
+  }
 }
 
 .trades-table__actions {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
 }
 
@@ -122,29 +136,29 @@
   transition: background 0.15s ease, color 0.15s ease;
 
   &--view {
-    background: #eff6ff;
-    color: #2563eb;
+    background: var(--clr-btn-view-bg);
+    color: var(--clr-btn-view-text);
 
     &:hover {
-      background: #dbeafe;
+      background: var(--clr-btn-view-hover);
     }
   }
 
   &--edit {
-    background: #fefce8;
-    color: #ca8a04;
+    background: var(--clr-btn-edit-bg);
+    color: var(--clr-btn-edit-text);
 
     &:hover {
-      background: #fef9c3;
+      background: var(--clr-btn-edit-hover);
     }
   }
 
   &--delete {
-    background: #fff1f2;
-    color: #e11d48;
+    background: var(--clr-btn-del-bg);
+    color: var(--clr-btn-del-text);
 
     &:hover {
-      background: #ffe4e6;
+      background: var(--clr-btn-del-hover);
     }
   }
 }
@@ -158,28 +172,28 @@
   letter-spacing: 0.04em;
 
   &--buy {
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--clr-badge-buy-bg);
+    color: var(--clr-badge-buy-text);
   }
 
   &--sell {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--clr-badge-sell-bg);
+    color: var(--clr-badge-sell-text);
   }
 
   &--open {
-    background: #dbeafe;
-    color: #1e40af;
+    background: var(--clr-badge-open-bg);
+    color: var(--clr-badge-open-text);
   }
 
   &--executed {
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--clr-badge-buy-bg);
+    color: var(--clr-badge-buy-text);
   }
 
   &--cancelled {
-    background: #f3f4f6;
-    color: #6b7280;
+    background: var(--clr-surface-alt);
+    color: var(--clr-text-3);
   }
 }
 
@@ -196,22 +210,22 @@
 
   &--primary {
     padding: 0.625rem 1.25rem;
-    background: #2563eb;
+    background: var(--clr-primary);
     color: #ffffff;
 
     &:hover {
-      background: #1d4ed8;
+      background: var(--clr-primary-hover);
     }
   }
 
   &--outline {
     padding: 0.375rem 0.875rem;
     background: transparent;
-    color: #2563eb;
-    border: 1px solid #2563eb;
+    color: var(--clr-primary);
+    border: 1px solid var(--clr-primary);
 
     &:hover {
-      background: #eff6ff;
+      background: var(--clr-primary-bg);
     }
   }
 

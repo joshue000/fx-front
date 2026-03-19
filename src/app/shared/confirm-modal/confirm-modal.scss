@@ -9,7 +9,7 @@
 }
 
 .modal {
-  background: #ffffff;
+  background: var(--clr-surface);
   border-radius: 8px;
   padding: 2rem;
   max-width: 420px;
@@ -19,12 +19,12 @@
   &__title {
     font-size: 1.125rem;
     font-weight: 600;
-    color: #1a1a2e;
+    color: var(--clr-text-1);
     margin: 0 0 0.75rem;
   }
 
   &__message {
-    color: #374151;
+    color: var(--clr-text-2);
     font-size: 0.9375rem;
     line-height: 1.5;
     margin: 0 0 1.5rem;
@@ -47,11 +47,11 @@
 
     &--cancel {
       background: transparent;
-      border: 1px solid #d1d5db;
-      color: #374151;
+      border: 1px solid var(--clr-border-input);
+      color: var(--clr-text-2);
 
       &:hover {
-        background: #f9fafb;
+        background: var(--clr-surface-hover);
       }
     }
 

@@ -1,6 +1,98 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* ─── Light mode (default) ─────────────────────────────────────────────────── */
+:root {
+  --clr-bg:             #ffffff;
+  --clr-surface:        #ffffff;
+  --clr-surface-alt:    #f5f7fa;
+  --clr-surface-hover:  #f9fafb;
+  --clr-surface-subtle: #f3f4f6;
+  --clr-border:         #e5e7eb;
+  --clr-border-input:   #d1d5db;
+  --clr-text-1:         #1a1a2e;
+  --clr-text-2:         #374151;
+  --clr-text-3:         #6b7280;
+  --clr-text-4:         #9ca3af;
+  --clr-primary:        #2563eb;
+  --clr-primary-hover:  #1d4ed8;
+  --clr-primary-bg:     #eff6ff;
+  --clr-primary-bg-hover: #dbeafe;
+  --clr-header-bg:      #0f172a;
+  --clr-header-text:    #ffffff;
+  --clr-btn-view-bg:    #eff6ff;
+  --clr-btn-view-hover: #dbeafe;
+  --clr-btn-view-text:  #2563eb;
+  --clr-btn-edit-bg:    #fefce8;
+  --clr-btn-edit-hover: #fef9c3;
+  --clr-btn-edit-text:  #ca8a04;
+  --clr-btn-del-bg:     #fff1f2;
+  --clr-btn-del-hover:  #ffe4e6;
+  --clr-btn-del-text:   #e11d48;
+  --clr-badge-buy-bg:   #d1fae5;
+  --clr-badge-buy-text: #065f46;
+  --clr-badge-sell-bg:  #fee2e2;
+  --clr-badge-sell-text:#991b1b;
+  --clr-badge-open-bg:  #dbeafe;
+  --clr-badge-open-text:#1e40af;
+  --clr-form-error-bg:    #fef2f2;
+  --clr-form-error-border:#fca5a5;
+  --clr-form-error-text:  #b91c1c;
+  --clr-form-focus:       #6366f1;
+  --clr-form-invalid:     #ef4444;
+}
+
+/* ─── Dark mode ─────────────────────────────────────────────────────────────── */
+body.dark {
+  --clr-bg:             #0f172a;
+  --clr-surface:        #1e293b;
+  --clr-surface-alt:    #253347;
+  --clr-surface-hover:  #283548;
+  --clr-surface-subtle: #1e293b;
+  --clr-border:         #334155;
+  --clr-border-input:   #475569;
+  --clr-text-1:         #f1f5f9;
+  --clr-text-2:         #cbd5e1;
+  --clr-text-3:         #94a3b8;
+  --clr-text-4:         #64748b;
+  --clr-primary:        #3b82f6;
+  --clr-primary-hover:  #2563eb;
+  --clr-primary-bg:     #1e3a5f;
+  --clr-primary-bg-hover: #1e3a8a;
+  --clr-header-bg:      #0f172a;
+  --clr-header-text:    #f1f5f9;
+  --clr-btn-view-bg:    #1e3a5f;
+  --clr-btn-view-hover: #1e3a8a;
+  --clr-btn-view-text:  #ffffff;
+  --clr-btn-edit-bg:    #3d2e00;
+  --clr-btn-edit-hover: #4d3a00;
+  --clr-btn-edit-text:  #ffffff;
+  --clr-btn-del-bg:     #3f0f1a;
+  --clr-btn-del-hover:  #4f1525;
+  --clr-btn-del-text:   #ffffff;
+  --clr-badge-buy-bg:   #064e3b;
+  --clr-badge-buy-text: #6ee7b7;
+  --clr-badge-sell-bg:  #450a0a;
+  --clr-badge-sell-text:#fca5a5;
+  --clr-badge-open-bg:  #1e3a5f;
+  --clr-badge-open-text:#93c5fd;
+  --clr-form-error-bg:    #450a0a;
+  --clr-form-error-border:#991b1b;
+  --clr-form-error-text:  #fca5a5;
+  --clr-form-focus:       #818cf8;
+  --clr-form-invalid:     #f87171;
+}
+
 html, body {
+  height: 100%;
+  margin: 0;
   font-family: 'Inter', sans-serif;
+  background: var(--clr-bg);
+  color: var(--clr-text-2);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+router-outlet + * {
+  flex: 1;
 }
 
 .loading-spinner {
@@ -9,7 +101,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  background: var(--clr-bg);
   z-index: 50;
 
   img {
