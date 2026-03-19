@@ -60,3 +60,13 @@
   font-size: 0.875rem;
   user-select: none;
 }
+
+@media (max-width: 640px) {
+  .pagination__btn:not(.pagination__btn--nav):not(.pagination__btn--active) {
+    display: none;
+  }
+
+  .pagination__ellipsis {
+    display: none;
+  }
+}
