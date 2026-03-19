@@ -95,11 +95,13 @@ export class TradeForm implements OnInit {
 
   showToast = false;
   toastMessage = '';
+  submitted = false;
 
   constructor() {
     this.actions$
       .pipe(ofType(createTradeSuccess), takeUntilDestroyed())
       .subscribe(() => {
+        this.submitted = true;
         this.toastMessage = 'tradeForm.toast.created';
         this.showToast = true;
       });
@@ -107,6 +109,7 @@ export class TradeForm implements OnInit {
     this.actions$
       .pipe(ofType(updateTradeSuccess), takeUntilDestroyed())
       .subscribe(() => {
+        this.submitted = true;
         this.toastMessage = 'tradeForm.toast.updated';
         this.showToast = true;
       });

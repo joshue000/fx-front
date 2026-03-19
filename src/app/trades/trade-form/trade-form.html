@@ -140,7 +140,7 @@
           <button
             type="submit"
             class="btn btn--primary"
-            [disabled]="(submitting$ | async) || form.invalid"
+            [disabled]="(submitting$ | async) || form.invalid || submitted"
             [attr.aria-label]="'tradeForm.button.createOrder' | translate"
           >
             @if (submitting$ | async) {

@@ -378,11 +378,23 @@ describe('TradeForm', () => {
       expect(component.toastMessage).toBe('tradeForm.toast.created');
     });
 
+    it('should set submitted to true after createTradeSuccess', () => {
+      actions$.next(createTradeSuccess({ trade: {} as TradeOrder }));
+
+      expect(component.submitted).toBeTrue();
+    });
+
     it('should show the toast with the update message after updateTradeSuccess', () => {
       actions$.next(updateTradeSuccess({ trade: {} as TradeOrder }));
 
       expect(component.showToast).toBeTrue();
       expect(component.toastMessage).toBe('tradeForm.toast.updated');
+    });
+
+    it('should set submitted to true after updateTradeSuccess', () => {
+      actions$.next(updateTradeSuccess({ trade: {} as TradeOrder }));
+
+      expect(component.submitted).toBeTrue();
     });
 
     it('should navigate to /trades when the toast is dismissed', () => {
@@ -438,6 +450,23 @@ describe('TradeForm', () => {
 
       const submitBtn = fixture.nativeElement.querySelector('button[type="submit"]');
       expect(submitBtn.disabled).toBeFalse();
+    });
+
+    it('should disable the submit button after a successful submission', async () => {
+      component.form.setValue({
+        pair: 'EURUSD',
+        side: OrderSide.buy,
+        type: OrderType.limit,
+        amount: 10000,
+        price: 1.0,
+        status: OrderStatus.open,
+      });
+      actions$.next(createTradeSuccess({ trade: {} as TradeOrder }));
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const submitBtn = fixture.nativeElement.querySelector('button[type="submit"]');
+      expect(submitBtn.disabled).toBeTrue();
     });
 
     it('should show the submit button in create mode', () => {

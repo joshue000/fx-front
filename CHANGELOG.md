@@ -6,6 +6,16 @@ Format: `MAJOR.MINOR.PATCH` — patch is incremented for each change.
 
 ---
 
+## [0.0.23] - 2026-03-19
+
+### Fixed
+- `TradeForm`: submit button now remains disabled after a successful create/update until the page navigates away; prevents duplicate requests being sent during the toast display window
+
+### Tests
+- `trade-form.spec.ts`: added tests asserting `submitted` flag is set to `true` after `createTradeSuccess` and `updateTradeSuccess`, and that the submit button is disabled after a successful submission
+
+---
+
 ## [0.0.22] - 2026-03-19
 
 ### Added
