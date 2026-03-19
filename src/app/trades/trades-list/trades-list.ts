@@ -28,12 +28,13 @@ import { PageSizeSelector } from '../../shared/page-size-selector/page-size-sele
 import { ConfirmModal } from '../../shared/confirm-modal/confirm-modal';
 import { ErrorModal } from '../../shared/error-modal/error-modal';
 import { ConnectionError } from '../../shared/connection-error/connection-error';
+import { Toast } from '../../shared/toast/toast';
 
 export const DEFAULT_PAGE_SIZE = 5;
 
 @Component({
   selector: 'app-trades-list',
-  imports: [AsyncPipe, UpperCasePipe, Pagination, PageSizeSelector, ConfirmModal, ErrorModal, ConnectionError],
+  imports: [AsyncPipe, UpperCasePipe, Pagination, PageSizeSelector, ConfirmModal, ErrorModal, ConnectionError, Toast],
   templateUrl: './trades-list.html',
   styleUrl: './trades-list.scss'
 })
@@ -56,6 +57,7 @@ export class TradesList implements OnInit {
   currentPageSize = DEFAULT_PAGE_SIZE;
   showDeleteModal = false;
   deleteTargetId: string | null = null;
+  showToast = false;
 
   constructor() {
     this.actions$
@@ -63,6 +65,7 @@ export class TradesList implements OnInit {
       .subscribe(() => {
         this.showDeleteModal = false;
         this.deleteTargetId = null;
+        this.showToast = true;
         this.store.dispatch(loadTrades({ page: 1, limit: this.currentPageSize }));
       });
   }
@@ -118,6 +121,10 @@ export class TradesList implements OnInit {
   onDeleteCancelled(): void {
     this.showDeleteModal = false;
     this.deleteTargetId = null;
+  }
+
+  onToastDismissed(): void {
+    this.showToast = false;
   }
 
   goToCreate(): void {

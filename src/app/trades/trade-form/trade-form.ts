@@ -34,12 +34,13 @@ import { orderPriceGroupValidator, validPairValidator } from './validators/order
 import { PRICE_CROSS_FIELD_ERROR_KEYS } from './validators/order-price.validator';
 import { ErrorModal } from '../../shared/error-modal/error-modal';
 import { ConnectionError } from '../../shared/connection-error/connection-error';
+import { Toast } from '../../shared/toast/toast';
 
 export type TradeFormMode = 'create' | 'view' | 'edit';
 
 @Component({
   selector: 'app-trade-form',
-  imports: [ReactiveFormsModule, AsyncPipe, UpperCasePipe, ErrorModal, ConnectionError],
+  imports: [ReactiveFormsModule, AsyncPipe, UpperCasePipe, ErrorModal, ConnectionError, Toast],
   templateUrl: './trade-form.html',
   styleUrl: './trade-form.scss',
 })
@@ -89,14 +90,23 @@ export class TradeForm implements OnInit {
     { validators: [orderPriceGroupValidator] },
   );
 
+  showToast = false;
+  toastMessage = '';
+
   constructor() {
     this.actions$
       .pipe(ofType(createTradeSuccess), takeUntilDestroyed())
-      .subscribe(() => this.router.navigate(['/trades']));
+      .subscribe(() => {
+        this.toastMessage = 'Trade created successfully.';
+        this.showToast = true;
+      });
 
     this.actions$
       .pipe(ofType(updateTradeSuccess), takeUntilDestroyed())
-      .subscribe(() => this.router.navigate(['/trades']));
+      .subscribe(() => {
+        this.toastMessage = 'Trade updated successfully.';
+        this.showToast = true;
+      });
 
     this.form.valueChanges
       .pipe(takeUntilDestroyed())
@@ -167,6 +177,10 @@ export class TradeForm implements OnInit {
     if (this.tradeId) {
       this.store.dispatch(loadTrade({ id: this.tradeId }));
     }
+  }
+
+  onToastDismissed(): void {
+    this.router.navigate(['/trades']);
   }
 
   onSubmitErrorDismissed(): void {

@@ -111,6 +111,13 @@
   />
 }
 
+@if (showToast) {
+  <app-toast
+    message="Trade deleted successfully."
+    (dismissed)="onToastDismissed()"
+  />
+}
+
 @if (showDeleteModal) {
   <app-confirm-modal
     message="Are you sure you want to delete this trade? This action cannot be undone."
